@@ -1,4 +1,4 @@
-[![Stand With Ukraine](./banner2-direct.svg)](https://stand-with-ukraine.pp.ua/)
+
 
 # Bromite - Take back your browser
 <a href="https://github.com/bromite/bromite/releases/latest">
