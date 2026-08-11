@@ -4,53 +4,19 @@ Subject: ungoogled-chromium: Disable webRTC log uploader
 
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- .../media/webrtc/webrtc_log_uploader.cc       | 28 ++++---------------
- 1 file changed, 6 insertions(+), 22 deletions(-)
+ chrome/browser/ui/browser_ui_prefs.cc | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/chrome/browser/media/webrtc/webrtc_log_uploader.cc b/chrome/browser/media/webrtc/webrtc_log_uploader.cc
---- a/chrome/browser/media/webrtc/webrtc_log_uploader.cc
-+++ b/chrome/browser/media/webrtc/webrtc_log_uploader.cc
-@@ -126,28 +126,7 @@ void WebRtcLogUploader::LoggingStoppedDoUpload(
-   DCHECK(meta_data.get());
-   DCHECK(!upload_done_data.paths.directory.empty());
- 
--  std::string compressed_log = CompressLog(log_buffer.get());
--
--  std::string local_log_id;
--
--  if (base::PathExists(upload_done_data.paths.directory)) {
--    webrtc_logging::DeleteOldWebRtcLogFiles(upload_done_data.paths.directory);
--
--    local_log_id = base::NumberToString(base::Time::Now().ToDoubleT());
--    base::FilePath log_file_path =
--        upload_done_data.paths.directory.AppendASCII(local_log_id)
--            .AddExtension(FILE_PATH_LITERAL(".gz"));
--    WriteCompressedLogToFile(compressed_log, log_file_path);
--
--    base::FilePath log_list_path =
--        webrtc_logging::TextLogList::GetWebRtcLogListFileForDirectory(
--            upload_done_data.paths.directory);
--    AddLocallyStoredLogInfoToUploadListFile(log_list_path, local_log_id);
--  }
--
--  upload_done_data.local_log_id = local_log_id;
--  PrepareMultipartPostData(compressed_log, std::move(meta_data),
--                           std::move(upload_done_data));
-+  NotifyUploadDoneAndLogStats(net::HTTP_OK, net::OK, "", std::move(upload_done_data));
- }
- 
- void WebRtcLogUploader::PrepareMultipartPostData(
-@@ -158,6 +137,11 @@ void WebRtcLogUploader::PrepareMultipartPostData(
-   DCHECK(!compressed_log.empty());
-   DCHECK(meta_data.get());
- 
-+  if ((true)) {
-+    NotifyUploadDoneAndLogStats(net::HTTP_OK, net::OK, "", std::move(upload_done_data));
-+    return;
-+  }
-+
-   std::unique_ptr<std::string> post_data(new std::string());
-   SetupMultipart(post_data.get(), compressed_log,
-                  upload_done_data.paths.incoming_rtp_dump,
+diff --git a/chrome/browser/ui/browser_ui_prefs.cc b/chrome/browser/ui/browser_ui_prefs.cc
+--- a/chrome/browser/ui/browser_ui_prefs.cc
++++ b/chrome/browser/ui/browser_ui_prefs.cc
+@@ -153,7 +153,7 @@ void RegisterBrowserUserPrefs(user_prefs::PrefRegistrySyncable* registry) {
+   registry->RegisterStringPref(prefs::kWebRTCUDPPortRange, std::string());
+   registry->RegisterBooleanPref(prefs::kWebRtcEventLogCollectionAllowed, false);
+   registry->RegisterListPref(prefs::kWebRtcLocalIpsAllowedUrls);
+-  registry->RegisterBooleanPref(prefs::kWebRtcTextLogCollectionAllowed, true);
++  registry->RegisterBooleanPref(prefs::kWebRtcTextLogCollectionAllowed, false);
+   registry->RegisterListPref(
+       prefs::kWebRTCDiagnosticLogCollectionAllowedForOrigins,
+       base::ListValue());
 --
-2.25.1

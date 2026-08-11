@@ -4,37 +4,45 @@ Subject: Disable PrivacyGuide
 
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- chrome/common/chrome_features.cc | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ chrome/android/java/res/xml/privacy_preferences.xml | 1 +
+ chrome/browser/prefs/browser_prefs.cc               | 2 +-
+ chrome/browser/ui/webui/settings/settings_ui.cc     | 3 +--
+ 3 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/chrome/common/chrome_features.cc b/chrome/common/chrome_features.cc
---- a/chrome/common/chrome_features.cc
-+++ b/chrome/common/chrome_features.cc
-@@ -500,8 +500,8 @@ BASE_FEATURE(kHaTSDesktopDevToolsIssuesCSP,
+diff --git a/chrome/android/java/res/xml/privacy_preferences.xml b/chrome/android/java/res/xml/privacy_preferences.xml
+--- a/chrome/android/java/res/xml/privacy_preferences.xml
++++ b/chrome/android/java/res/xml/privacy_preferences.xml
+@@ -21,6 +21,7 @@ found in the LICENSE file.
+         android:fragment="org.chromium.chrome.browser.browsing_data.ClearBrowsingDataFragment" />
+     <Preference
+         android:key="privacy_guide"
++        app:isPreferenceVisible="false"
+         android:title="@string/privacy_guide_pref_title"
+         android:summary="@string/privacy_guide_pref_summary"
+         android:fragment="org.chromium.chrome.browser.privacy_guide.PrivacyGuideFragment" />
+diff --git a/chrome/browser/prefs/browser_prefs.cc b/chrome/browser/prefs/browser_prefs.cc
+--- a/chrome/browser/prefs/browser_prefs.cc
++++ b/chrome/browser/prefs/browser_prefs.cc
+@@ -2107,7 +2107,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry,
+   registry->RegisterBooleanPref(webauthn::pref_names::kAllowWithBrokenCerts,
+                                 false);
  
- // Enables or disables the Happiness Tracking System for Desktop Privacy Guide.
- BASE_FEATURE(kHappinessTrackingSurveysForDesktopPrivacyGuide,
--             "HappinessTrackingSurveysForDesktopPrivacyGuide",
--             base::FEATURE_DISABLED_BY_DEFAULT);
-+             "HappinessTrackingSurveysForDesktopPrivacyGuide",                      // must be disabled
-+             base::FEATURE_DISABLED_BY_DEFAULT);                                    // in Bromite
- const base::FeatureParam<base::TimeDelta>
-     kHappinessTrackingSurveysForDesktopPrivacyGuideTime{
-         &kHappinessTrackingSurveysForDesktopPrivacyGuide, "settings-time",
-@@ -910,11 +910,11 @@ BASE_FEATURE(kPrerenderFallbackToPreconnect,
-              "PrerenderFallbackToPreconnect",
-              base::FEATURE_ENABLED_BY_DEFAULT);
+-  registry->RegisterBooleanPref(prefs::kPrivacyGuideViewed, false);
++  registry->RegisterBooleanPref(prefs::kPrivacyGuideViewed, true);
  
--BASE_FEATURE(kPrivacyGuide2, "PrivacyGuide2", base::FEATURE_ENABLED_BY_DEFAULT);
-+BASE_FEATURE(kPrivacyGuide2, "PrivacyGuide2", base::FEATURE_DISABLED_BY_DEFAULT); // always disabled in Bromite
+   RegisterProfilePrefsForMigration(registry);
  
- BASE_FEATURE(kPrivacyGuideAndroid,
--             "PrivacyGuideAndroid",
--             base::FEATURE_DISABLED_BY_DEFAULT);
-+             "PrivacyGuideAndroid",               // always disabled
-+             base::FEATURE_DISABLED_BY_DEFAULT);  // in Bromite
+diff --git a/chrome/browser/ui/webui/settings/settings_ui.cc b/chrome/browser/ui/webui/settings/settings_ui.cc
+--- a/chrome/browser/ui/webui/settings/settings_ui.cc
++++ b/chrome/browser/ui/webui/settings/settings_ui.cc
+@@ -344,8 +344,7 @@ SettingsUI::SettingsUI(content::WebUI* web_ui)
+ #endif  // BUILDFLAG(IS_CHROMEOS)
  
- // Enables or disables push subscriptions keeping Chrome running in the
- // background when closed.
+   bool show_privacy_guide =
+-      base::FeatureList::IsEnabled(features::kPrivacyGuideForceAvailable) ||
+-      (!ShouldDisplayManagedUi(profile) && !profile->IsChild());
++      false;
+   html_source->AddBoolean("showPrivacyGuide", show_privacy_guide);
+ 
+   html_source->AddBoolean(
 --
-2.25.1

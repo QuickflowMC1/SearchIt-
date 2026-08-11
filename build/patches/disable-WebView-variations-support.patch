@@ -5,35 +5,39 @@ Subject: disable WebView variations support
 Original License: MIT - https://spdx.org/licenses/MIT.html
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- .../com/android/webview/chromium/WebViewChromiumAwInit.java   | 4 ----
- .../webview/chromium/WebViewChromiumFactoryProvider.java      | 2 --
- 2 files changed, 6 deletions(-)
+ .../android/webview/chromium/WebViewChromiumAwInit.java    | 7 -------
+ .../webview/chromium/WebViewChromiumFactoryProvider.java   | 4 ----
+ 2 files changed, 11 deletions(-)
 
 diff --git a/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumAwInit.java b/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumAwInit.java
 --- a/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumAwInit.java
 +++ b/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumAwInit.java
-@@ -199,10 +199,6 @@ public class WebViewChromiumAwInit {
+@@ -678,13 +678,6 @@ public class WebViewChromiumAwInit {
+                     }
  
-             AwBrowserProcess.configureChildProcessLauncher();
- 
--            // finishVariationsInitLocked() must precede native initialization so the seed is
--            // available when AwFeatureListCreator::SetUpFieldTrials() runs.
--            finishVariationsInitLocked();
+                     AwBrowserProcess.configureChildProcessLauncher();
 -
-             AwBrowserProcess.start();
-             AwBrowserProcess.handleMinidumpsAndSetMetricsConsent(true /* updateMetricsConsent */);
+-                    // finishVariationsInitLocked() must precede native initialization so
+-                    // the seed is available when AwFeatureListCreator::SetUpFieldTrials()
+-                    // runs.
+-                    if (!FastVariationsSeedSafeModeAction.hasRun()) {
+-                        finishVariationsInitLocked();
+-                    }
+                 });
  
+         addBrowserProcessStartTasksToQueue(
 diff --git a/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java b/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java
 --- a/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java
 +++ b/android_webview/glue/java/src/com/android/webview/chromium/WebViewChromiumFactoryProvider.java
-@@ -500,8 +500,6 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
-                 }
-             }
+@@ -683,10 +683,6 @@ public class WebViewChromiumFactoryProvider implements WebViewFactoryProvider {
+             // This must happen after pref value has been read and SafeMode setup has completed.
+             setupStartupTaskExperiments(androidXConfig);
  
--            mAwInit.startVariationsInit();
+-            if (!FastVariationsSeedSafeModeAction.hasRun()) {
+-                mAwInit.startVariationsInit();
+-            }
 -
-             mShouldDisableThreadChecking = shouldDisableThreadChecking(ctx);
- 
-             setSingleton(this);
+             if (WebViewCachedFlags.get()
+                     .isCachedFeatureEnabled(AwFeatures.WEBVIEW_MOVE_WORK_TO_PROVIDER_INIT)) {
+                 mAwInit.runNonUiThreadCapableStartupTasks();
 --
-2.25.1

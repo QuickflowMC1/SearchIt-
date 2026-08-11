@@ -1,4 +1,4 @@
-From: uazo <uazo@users.noreply.github.com>
+﻿From: uazo <uazo@users.noreply.github.com>
 Date: Thu, 24 Mar 2022 10:08:00 +0000
 Subject: Disable TLS resumption
 
@@ -25,124 +25,72 @@ See also:
 Original License: GPL-2.0-or-later - https://spdx.org/licenses/GPL-2.0-or-later.html
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- chrome/browser/about_flags.cc        |  6 +++
- chrome/browser/flag_descriptions.cc  |  8 ++++
- chrome/browser/flag_descriptions.h   |  6 +++
- net/base/features.cc                 |  8 ++++
- net/base/features.h                  |  6 +++
- net/http/http_network_session.cc     |  1 +
- net/quic/quic_stream_factory.cc      | 35 ++++++++++++++++-
- net/socket/ssl_client_socket_impl.cc | 59 ++++++++++++++++++++++++++++
- net/socket/ssl_client_socket_impl.h  |  2 +
- 9 files changed, 130 insertions(+), 1 deletion(-)
+ .../about_flags_cc/Disable-TLS-resumption.inc | 12 ++++
+ .../features_cc/Disable-TLS-resumption.inc    |  7 ++
+ .../features_h/Disable-TLS-resumption.inc     |  5 ++
+ net/http/http_network_session.cc              |  1 +
+ net/quic/quic_session_pool.cc                 | 35 +++++++++-
+ net/socket/ssl_client_socket_impl.cc          | 68 +++++++++++++++++++
+ net/socket/ssl_client_socket_impl.h           |  2 +
+ 7 files changed, 128 insertions(+), 2 deletions(-)
+ create mode 100644 SearchIt!_flags/chrome/browser/about_flags_cc/Disable-TLS-resumption.inc
+ create mode 100644 SearchIt!_flags/net/base/features_cc/Disable-TLS-resumption.inc
+ create mode 100644 SearchIt!_flags/net/base/features_h/Disable-TLS-resumption.inc
 
-diff --git a/chrome/browser/about_flags.cc b/chrome/browser/about_flags.cc
---- a/chrome/browser/about_flags.cc
-+++ b/chrome/browser/about_flags.cc
-@@ -5016,6 +5016,12 @@ const FeatureEntry kFeatureEntries[] = {
-     {"enable-tls13-early-data", flag_descriptions::kEnableTLS13EarlyDataName,
-      flag_descriptions::kEnableTLS13EarlyDataDescription, kOsAll,
-      FEATURE_VALUE_TYPE(net::features::kEnableTLS13EarlyData)},
-+    {"disable-tls-resumption", flag_descriptions::kDisableTLSResumptionName,
-+     flag_descriptions::kDisableTLSResumptionDescription, kOsAll,
+diff --git a/SearchIt!_flags/chrome/browser/about_flags_cc/Disable-TLS-resumption.inc b/SearchIt!_flags/chrome/browser/about_flags_cc/Disable-TLS-resumption.inc
+new file mode 100644
+--- /dev/null
++++ b/SearchIt!_flags/chrome/browser/about_flags_cc/Disable-TLS-resumption.inc
+@@ -0,0 +1,12 @@
++#ifdef FLAG_SECTION
++
++    {"disable-tls-resumption",
++     "Disable TLS Session Resumption",
++     "Disable TLS session resumption.", kOsAll,
 +     FEATURE_VALUE_TYPE(net::features::kDisableTLSResumption)},
-+    {"log-tls-resumption", flag_descriptions::kLogTLSResumptionName,
-+     flag_descriptions::kLogTLSResumptionDescription, kOsAll,
++    {"log-tls-resumption",
++     "Log TLS Session Resumption",
++     "Log TLS Session Resumption", kOsAll,
 +     FEATURE_VALUE_TYPE(net::features::kLogTLSResumption)},
-     {"post-quantum-cecpq2", flag_descriptions::kPostQuantumCECPQ2Name,
-      flag_descriptions::kPostQuantumCECPQ2Description, kOsAll,
-      FEATURE_VALUE_TYPE(net::features::kPostQuantumCECPQ2)},
-diff --git a/chrome/browser/flag_descriptions.cc b/chrome/browser/flag_descriptions.cc
---- a/chrome/browser/flag_descriptions.cc
-+++ b/chrome/browser/flag_descriptions.cc
-@@ -1036,6 +1036,14 @@ const char kEnableTLS13EarlyDataDescription[] =
-     "during the handshake when resuming a connection to a compatible TLS 1.3 "
-     "server.";
- 
-+const char kDisableTLSResumptionName[] = "Disable TLS Session Resumption";
-+const char kDisableTLSResumptionDescription[] =
-+    "Disable TLS session resumption.";
 +
-+const char kLogTLSResumptionName[] = "Log TLS Session Resumption";
-+const char kLogTLSResumptionDescription[] =
-+    "Log TLS session resumption";
++#endif
+diff --git a/SearchIt!_flags/net/base/features_cc/Disable-TLS-resumption.inc b/SearchIt!_flags/net/base/features_cc/Disable-TLS-resumption.inc
+new file mode 100644
+--- /dev/null
++++ b/SearchIt!_flags/net/base/features_cc/Disable-TLS-resumption.inc
+@@ -0,0 +1,7 @@
++SearchIt!_FEATURE(kDisableTLSResumption,
++                "DisableTLSResumption",
++                base::FEATURE_ENABLED_BY_DEFAULT);
 +
- const char kEnhancedNetworkVoicesName[] = "Enhanced network voices";
- const char kEnhancedNetworkVoicesDescription[] =
-     "This option enables high-quality, network-based voices in "
-diff --git a/chrome/browser/flag_descriptions.h b/chrome/browser/flag_descriptions.h
---- a/chrome/browser/flag_descriptions.h
-+++ b/chrome/browser/flag_descriptions.h
-@@ -595,6 +595,12 @@ extern const char kEnablePreinstalledWebAppDuplicationFixerDescription[];
- extern const char kEnableTLS13EarlyDataName[];
- extern const char kEnableTLS13EarlyDataDescription[];
- 
-+extern const char kDisableTLSResumptionName[];
-+extern const char kDisableTLSResumptionDescription[];
-+
-+extern const char kLogTLSResumptionName[];
-+extern const char kLogTLSResumptionDescription[];
-+
- extern const char kEnhancedNetworkVoicesName[];
- extern const char kEnhancedNetworkVoicesDescription[];
- 
-diff --git a/net/base/features.cc b/net/base/features.cc
---- a/net/base/features.cc
-+++ b/net/base/features.cc
-@@ -61,6 +61,14 @@ const base::FeatureParam<base::TimeDelta> kUseDnsHttpsSvcbSecureExtraTimeMin{
-     &kUseDnsHttpsSvcb, "UseDnsHttpsSvcbSecureExtraTimeMin",
-     base::Milliseconds(5)};
- 
-+BASE_FEATURE(kDisableTLSResumption,
-+             "DisableTLSResumption",
-+             base::FEATURE_ENABLED_BY_DEFAULT);
-+
-+BASE_FEATURE(kLogTLSResumption,
-+             "LogTLSResumption",
-+             base::FEATURE_DISABLED_BY_DEFAULT);
-+
- BASE_FEATURE(kUseDnsHttpsSvcbAlpn,
-              "UseDnsHttpsSvcbAlpn",
-              base::FEATURE_DISABLED_BY_DEFAULT);
-diff --git a/net/base/features.h b/net/base/features.h
---- a/net/base/features.h
-+++ b/net/base/features.h
-@@ -91,6 +91,12 @@ NET_EXPORT BASE_DECLARE_FEATURE(kUseDnsHttpsSvcbAlpn);
- // Enables TLS 1.3 early data.
- NET_EXPORT BASE_DECLARE_FEATURE(kEnableTLS13EarlyData);
- 
++SearchIt!_FEATURE(kLogTLSResumption,
++                "LogTLSResumption",
++                base::FEATURE_DISABLED_BY_DEFAULT);
+diff --git a/SearchIt!_flags/net/base/features_h/Disable-TLS-resumption.inc b/SearchIt!_flags/net/base/features_h/Disable-TLS-resumption.inc
+new file mode 100644
+--- /dev/null
++++ b/SearchIt!_flags/net/base/features_h/Disable-TLS-resumption.inc
+@@ -0,0 +1,5 @@
 +// Disables TLS resumption.
 +NET_EXPORT BASE_DECLARE_FEATURE(kDisableTLSResumption);
 +
 +// Log TLS resumption.
 +NET_EXPORT BASE_DECLARE_FEATURE(kLogTLSResumption);
-+
- // Enables the TLS Encrypted ClientHello feature.
- // https://datatracker.ietf.org/doc/html/draft-ietf-tls-esni-13
- NET_EXPORT BASE_DECLARE_FEATURE(kEncryptedClientHello);
 diff --git a/net/http/http_network_session.cc b/net/http/http_network_session.cc
 --- a/net/http/http_network_session.cc
 +++ b/net/http/http_network_session.cc
-@@ -212,6 +212,7 @@ HttpNetworkSession::HttpNetworkSession(const HttpNetworkSessionParams& params,
+@@ -217,6 +217,7 @@ HttpNetworkSession::HttpNetworkSession(const HttpNetworkSessionParams& params,
  
-   next_protos_.push_back(kProtoHTTP11);
+   next_protos_.push_back(NextProto::kProtoHTTP11);
  
 +  DCHECK(context.quic_context->params()->max_server_configs_stored_in_properties == 0);
    http_server_properties_->SetMaxServerConfigsStoredInProperties(
        context.quic_context->params()->max_server_configs_stored_in_properties);
    http_server_properties_->SetBrokenAlternativeServicesDelayParams(
-diff --git a/net/quic/quic_stream_factory.cc b/net/quic/quic_stream_factory.cc
---- a/net/quic/quic_stream_factory.cc
-+++ b/net/quic/quic_stream_factory.cc
-@@ -72,6 +72,7 @@
- #include "net/third_party/quiche/src/quiche/quic/core/quic_utils.h"
- #include "net/third_party/quiche/src/quiche/quic/platform/api/quic_flags.h"
- #include "third_party/boringssl/src/include/openssl/aead.h"
-+#include "third_party/boringssl/src/include/openssl/ssl.h"
- #include "url/gurl.h"
- #include "url/scheme_host_port.h"
- #include "url/url_constants.h"
-@@ -245,6 +246,38 @@ quic::ParsedQuicVersion SelectQuicVersion(
+diff --git a/net/quic/quic_session_pool.cc b/net/quic/quic_session_pool.cc
+--- a/net/quic/quic_session_pool.cc
++++ b/net/quic/quic_session_pool.cc
+@@ -384,6 +384,38 @@ base::TimeDelta GetAdditionalDelayForMainJob() {
  
  }  // namespace
  
@@ -178,22 +126,31 @@ diff --git a/net/quic/quic_stream_factory.cc b/net/quic/quic_stream_factory.cc
 +  }
 +};
 +
- // Refcounted class that owns quic::QuicCryptoClientConfig and tracks how many
- // consumers are using it currently. When the last reference is freed, the
- // QuicCryptoClientConfigHandle informs the owning QuicStreamFactory, moves it
-@@ -2249,7 +2282,7 @@ QuicStreamFactory::CreateCryptoConfigHandle(
-               sct_auditing_delegate_,
-               HostsFromOrigins(params_.origins_to_force_quic_on),
-               actual_network_anonymization_key),
--          std::make_unique<quic::QuicClientSessionCache>(), this);
-+          std::make_unique<BromiteSessionCache>(), this);
+ QuicSessionRequest::QuicSessionRequest(QuicSessionPool* pool) : pool_(pool) {}
+ 
+ QuicSessionRequest::~QuicSessionRequest() {
+@@ -2484,8 +2516,7 @@ QuicSessionPool::CreateCryptoConfigHandle(QuicCryptoClientConfigKey key) {
+               cert_verifier_, transport_security_state_, sct_auditing_delegate_,
+               std::move(hostnames_to_allow_unknown_roots),
+               key.network_anonymization_key),
+-          std::make_unique<quic::QuicClientSessionCache>(
+-              kDefaultQuicSessionCacheSize),
++          std::make_unique<BromiteSessionCache>(),
+           kDefaultQuicSessionCacheSize, this);
  
    quic::QuicCryptoClientConfig* crypto_config = crypto_config_owner->config();
-   crypto_config->set_user_agent_id(params_.user_agent_id);
 diff --git a/net/socket/ssl_client_socket_impl.cc b/net/socket/ssl_client_socket_impl.cc
 --- a/net/socket/ssl_client_socket_impl.cc
 +++ b/net/socket/ssl_client_socket_impl.cc
-@@ -392,7 +392,33 @@ SSLClientSocketImpl::SSLClientSocketImpl(
+@@ -31,6 +31,7 @@
+ #include "base/strings/string_view_util.h"
+ #include "base/synchronization/lock.h"
+ #include "base/task/sequenced_task_runner.h"
++#include "base/types/fixed_array.h"
+ #include "base/trace_event/trace_event.h"
+ #include "base/values.h"
+ #include "build/build_config.h"
+@@ -292,7 +293,41 @@ SSLClientSocketImpl::SSLClientSocketImpl(
    CHECK(context_);
  }
  
@@ -207,18 +164,26 @@ diff --git a/net/socket/ssl_client_socket_impl.cc b/net/socket/ssl_client_socket
 +  }
 +
 +  unsigned len;
-+  auto* session_id = SSL_SESSION_get_id(session, &len);
++  const uint8_t *session_id = SSL_SESSION_get_id(session, &len);
++  base::FixedArray<uint8_t> session_id_bytes(len);
++  for (unsigned i = 0; i < len; i++) {
++    session_id_bytes[i] = UNSAFE_TODO(session_id[i]);
++  }
 +
 +  const uint8_t *ticket;
 +  size_t ticklen;
 +  SSL_SESSION_get0_ticket(session, &ticket, &ticklen);
++  base::FixedArray<uint8_t> ticket_bytes(ticklen);
++  for (size_t i = 0; i < ticklen; i++) {
++    ticket_bytes[i] = UNSAFE_TODO(ticket[i]);
++  }
 +
 +  LOG(INFO) << "SSL Log: "
 +            << tag
 +            << " host: " << host_and_port_.ToString()
 +            << " NIK: " << ssl_config_.network_anonymization_key.ToDebugString()
-+            << " sessionid: " << base::HexEncode(session_id, len)
-+            << (ticklen > 0 ? " ticket:" + base::HexEncode(ticket, ticklen) : "");
++            << " sessionid: " << base::HexEncode(base::span<uint8_t>(session_id_bytes))
++            << (ticklen > 0 ? " ticket:" + base::HexEncode(ticket_bytes) : "");
 +}
 +
  SSLClientSocketImpl::~SSLClientSocketImpl() {
@@ -227,7 +192,7 @@ diff --git a/net/socket/ssl_client_socket_impl.cc b/net/socket/ssl_client_socket
    Disconnect();
  }
  
-@@ -786,6 +812,8 @@ int SSLClientSocketImpl::Init() {
+@@ -710,6 +745,8 @@ int SSLClientSocketImpl::Init() {
      }
      if (session)
        SSL_set_session(ssl_.get(), session.get());
@@ -236,7 +201,7 @@ diff --git a/net/socket/ssl_client_socket_impl.cc b/net/socket/ssl_client_socket
    }
  
    transport_adapter_ = std::make_unique<SocketBIOAdapter>(
-@@ -1074,6 +1102,35 @@ int SSLClientSocketImpl::DoHandshakeComplete(int result) {
+@@ -994,6 +1031,35 @@ int SSLClientSocketImpl::DoHandshakeComplete(int result) {
                      : SSLHandshakeDetails::kTLS13Full;
      }
    }
@@ -271,8 +236,8 @@ diff --git a/net/socket/ssl_client_socket_impl.cc b/net/socket/ssl_client_socket
 +  }
    UMA_HISTOGRAM_ENUMERATION("Net.SSLHandshakeDetails", details);
  
-   // Measure TLS connections that implement the renegotiation_info extension.
-@@ -1746,6 +1803,8 @@ bool SSLClientSocketImpl::IsRenegotiationAllowed() const {
+   // Measure TLS connections that implement the renegotiation_info and EMS
+@@ -1624,6 +1690,8 @@ bool SSLClientSocketImpl::IsRenegotiationAllowed() const {
  }
  
  bool SSLClientSocketImpl::IsCachingEnabled() const {
@@ -284,9 +249,9 @@ diff --git a/net/socket/ssl_client_socket_impl.cc b/net/socket/ssl_client_socket
 diff --git a/net/socket/ssl_client_socket_impl.h b/net/socket/ssl_client_socket_impl.h
 --- a/net/socket/ssl_client_socket_impl.h
 +++ b/net/socket/ssl_client_socket_impl.h
-@@ -127,6 +127,8 @@ class SSLClientSocketImpl : public SSLClientSocket,
-   friend class SSLClientSocket;
+@@ -128,6 +128,8 @@ class NET_EXPORT_PRIVATE SSLClientSocketImpl
    friend class SSLContext;
+   FRIEND_TEST_ALL_PREFIXES(SSLClientSocketTest, ParseServerTrustAnchorIDs);
  
 +  void Log_ssl_session_data(const std::string& tag, SSL_SESSION* session);
 +
@@ -294,4 +259,3 @@ diff --git a/net/socket/ssl_client_socket_impl.h b/net/socket/ssl_client_socket_
    void DoReadCallback(int result);
    void DoWriteCallback(int result);
 --
-2.25.1

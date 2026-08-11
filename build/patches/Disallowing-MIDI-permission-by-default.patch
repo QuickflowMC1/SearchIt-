@@ -1,0 +1,17 @@
+﻿From: uazo <uazo@users.noreply.github.com>
+Date: Sat, 3 Jun 2023 13:11:22 +0000
+Subject: Disallowing MIDI permission by default
+
+License: GPL-2.0-or-later - https://spdx.org/licenses/GPL-2.0-or-later.html
+---
+ .../features_cc/Disallowing-MIDI-permission-by-default.inc       | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 SearchIt!_flags/third_party/blink/common/features_cc/Disallowing-MIDI-permission-by-default.inc
+
+diff --git a/SearchIt!_flags/third_party/blink/common/features_cc/Disallowing-MIDI-permission-by-default.inc b/SearchIt!_flags/third_party/blink/common/features_cc/Disallowing-MIDI-permission-by-default.inc
+new file mode 100644
+--- /dev/null
++++ b/SearchIt!_flags/third_party/blink/common/features_cc/Disallowing-MIDI-permission-by-default.inc
+@@ -0,0 +1 @@
++SET_SearchIt!_FEATURE_ENABLED(kBlockMidiByDefault);
+--

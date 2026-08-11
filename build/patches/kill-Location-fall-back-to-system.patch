@@ -1,17 +1,18 @@
-From: thermatk <thermatk@thermatk.com>
+﻿From: thermatk <thermatk@thermatk.com>
 Date: Fri, 22 Jun 2018 17:05:17 +0200
 Subject: kill Location, fall back to system
 
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- services/device/geolocation/BUILD.gn                   |  1 -
- .../device/geolocation/LocationProviderFactory.java    | 10 ++--------
- 2 files changed, 2 insertions(+), 9 deletions(-)
+ services/device/geolocation/BUILD.gn          |  1 -
+ .../geolocation/LocationProviderFactory.java  | 20 ++-----------------
+ services/device/public/cpp/device_features.cc |  3 ++-
+ 3 files changed, 4 insertions(+), 20 deletions(-)
 
 diff --git a/services/device/geolocation/BUILD.gn b/services/device/geolocation/BUILD.gn
 --- a/services/device/geolocation/BUILD.gn
 +++ b/services/device/geolocation/BUILD.gn
-@@ -159,7 +159,6 @@ if (is_android) {
+@@ -156,7 +156,6 @@ if (is_android) {
        "android/java/src/org/chromium/device/geolocation/LocationProviderAdapter.java",
        "android/java/src/org/chromium/device/geolocation/LocationProviderAndroid.java",
        "android/java/src/org/chromium/device/geolocation/LocationProviderFactory.java",
@@ -22,7 +23,7 @@ diff --git a/services/device/geolocation/BUILD.gn b/services/device/geolocation/
 diff --git a/services/device/geolocation/android/java/src/org/chromium/device/geolocation/LocationProviderFactory.java b/services/device/geolocation/android/java/src/org/chromium/device/geolocation/LocationProviderFactory.java
 --- a/services/device/geolocation/android/java/src/org/chromium/device/geolocation/LocationProviderFactory.java
 +++ b/services/device/geolocation/android/java/src/org/chromium/device/geolocation/LocationProviderFactory.java
-@@ -27,19 +27,13 @@ public class LocationProviderFactory {
+@@ -51,28 +51,12 @@ public class LocationProviderFactory {
  
      @CalledByNative
      public static void useGmsCoreLocationProvider() {
@@ -32,17 +33,45 @@ diff --git a/services/device/geolocation/android/java/src/org/chromium/device/ge
  
      public static LocationProvider create() {
          if (sProviderImpl != null) return sProviderImpl;
- 
+-
 -        if (sUseGmsCoreLocationProvider
 -                && LocationProviderGmsCore.isGooglePlayServicesAvailable(
--                           ContextUtils.getApplicationContext())) {
+-                        ContextUtils.getApplicationContext())) {
 -            sProviderImpl = new LocationProviderGmsCore(ContextUtils.getApplicationContext());
+-            RecordHistogram.recordEnumeratedHistogram(
+-                    "Geolocation.AndroidLocationProvider.ProviderType",
+-                    LocationProviderType.GMS_CORE,
+-                    LocationProviderType.COUNT);
+-
 -        } else {
--            sProviderImpl = new LocationProviderAndroid();
+-            sProviderImpl = new LocationProviderAndroid(ContextUtils.getApplicationContext());
+-            RecordHistogram.recordEnumeratedHistogram(
+-                    "Geolocation.AndroidLocationProvider.ProviderType",
+-                    LocationProviderType.ANDROID,
+-                    LocationProviderType.COUNT);
 -        }
-+        sProviderImpl = new LocationProviderAndroid();
++        sProviderImpl = new LocationProviderAndroid(ContextUtils.getApplicationContext());
          return sProviderImpl;
      }
  }
+diff --git a/services/device/public/cpp/device_features.cc b/services/device/public/cpp/device_features.cc
+--- a/services/device/public/cpp/device_features.cc
++++ b/services/device/public/cpp/device_features.cc
+@@ -73,6 +73,7 @@ BASE_FEATURE(kLocationProviderManager, base::FEATURE_ENABLED_BY_DEFAULT);
+ #else
+ BASE_FEATURE(kLocationProviderManager, base::FEATURE_DISABLED_BY_DEFAULT);
+ #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_WIN)
++SET_SearchIt!_FEATURE_DISABLED(kLocationProviderManager);
+ 
+ #if BUILDFLAG(IS_ANDROID)
+ // Enables registering & unregistering of the Battery Status Manager broadcast
+@@ -117,7 +118,7 @@ const base::FeatureParam<device::mojom::LocationProviderManagerMode>
+ const base::FeatureParam<device::mojom::LocationProviderManagerMode>
+     kLocationProviderManagerParam{
+         &kLocationProviderManager, "LocationProviderManagerMode",
+-        device::mojom::LocationProviderManagerMode::kNetworkOnly,
++        device::mojom::LocationProviderManagerMode::kPlatformOnly,
+         &location_provider_manager_mode_options};
+ #endif  // BUILDFLAG(IS_MAC)
+ 
 --
-2.25.1

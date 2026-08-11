@@ -1,25 +1,17 @@
-From: csagan5 <32685696+csagan5@users.noreply.github.com>
+﻿From: csagan5 <32685696+csagan5@users.noreply.github.com>
 Date: Sat, 3 Dec 2022 12:02:20 +0100
 Subject: Enable third-party storage partitioning
 
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- net/base/features.cc | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ .../base/features_cc/Enable-third-party-storage-partitioning.inc | 1 +
+ 1 file changed, 1 insertion(+)
+ create mode 100644 SearchIt!_flags/net/base/features_cc/Enable-third-party-storage-partitioning.inc
 
-diff --git a/net/base/features.cc b/net/base/features.cc
---- a/net/base/features.cc
-+++ b/net/base/features.cc
-@@ -362,8 +362,8 @@ const base::FeatureParam<bool> kStorageAccessAPIAutoDenyOutsideFPS{
- // Enables partitioning of third party storage (IndexedDB, CacheStorage, etc.)
- // by the top level site to reduce fingerprinting.
- BASE_FEATURE(kThirdPartyStoragePartitioning,
--             "ThirdPartyStoragePartitioning",
--             base::FEATURE_DISABLED_BY_DEFAULT);
-+             "ThirdPartyStoragePartitioning",       // must be enabled
-+             base::FEATURE_ENABLED_BY_DEFAULT);     // in Bromite
- 
- BASE_FEATURE(kAlpsParsing, "AlpsParsing", base::FEATURE_ENABLED_BY_DEFAULT);
- 
+diff --git a/SearchIt!_flags/net/base/features_cc/Enable-third-party-storage-partitioning.inc b/SearchIt!_flags/net/base/features_cc/Enable-third-party-storage-partitioning.inc
+new file mode 100644
+--- /dev/null
++++ b/SearchIt!_flags/net/base/features_cc/Enable-third-party-storage-partitioning.inc
+@@ -0,0 +1 @@
++SET_SearchIt!_FEATURE_ENABLED(kThirdPartyStoragePartitioning);
 --
-2.25.1

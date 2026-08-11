@@ -1,86 +1,161 @@
-From: uazo <uazo@users.noreply.github.com>
+﻿From: uazo <uazo@users.noreply.github.com>
 Date: Mon, 2 May 2022 11:48:03 +0000
 Subject: Add site engagement flag
 
-Enabled by default.
+Disabled by default.
 
 Original License: GPL-2.0-or-later - https://spdx.org/licenses/GPL-2.0-or-later.html
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- chrome/browser/about_flags.cc                 |  6 ++++
- chrome/browser/flag_descriptions.cc           |  5 +++
- chrome/browser/flag_descriptions.h            |  3 ++
+ chrome/browser/about_flags.cc                 |  1 +
+ .../engagement/important_sites_util.cc        |  9 +++++
+ .../browser/media/media_engagement_service.cc |  4 ++-
+ .../auto_picture_in_picture_tab_helper.cc     |  2 +-
+ .../internal/tracker_impl.cc                  |  3 ++
+ .../public/feature_configurations.cc          |  7 ++++
  .../content/site_engagement_score.cc          |  5 +++
  components/site_engagement/core/BUILD.gn      |  6 ++++
- components/site_engagement/core/features.cc   | 29 ++++++++++++++++
+ components/site_engagement/core/features.cc   | 30 ++++++++++++++++
  components/site_engagement/core/features.h    | 34 +++++++++++++++++++
- 7 files changed, 88 insertions(+)
+ .../Add-site-engagement-flag.inc              | 10 ++++++
+ 11 files changed, 109 insertions(+), 2 deletions(-)
  create mode 100644 components/site_engagement/core/features.cc
  create mode 100644 components/site_engagement/core/features.h
+ create mode 100644 SearchIt!_flags/chrome/browser/about_flags_cc/Add-site-engagement-flag.inc
 
 diff --git a/chrome/browser/about_flags.cc b/chrome/browser/about_flags.cc
 --- a/chrome/browser/about_flags.cc
 +++ b/chrome/browser/about_flags.cc
-@@ -142,6 +142,7 @@
- #include "components/segmentation_platform/public/features.h"
- #include "components/send_tab_to_self/features.h"
+@@ -171,6 +171,7 @@
+ #include "components/sensitive_content/features.h"
  #include "components/services/heap_profiling/public/cpp/switches.h"
+ #include "components/services/storage/dom_storage/features.h"
 +#include "components/site_engagement/core/features.h"
  #include "components/shared_highlighting/core/common/shared_highlighting_features.h"
+ #include "components/sharing_message/features.h"
  #include "components/signin/core/browser/dice_account_reconcilor_delegate.h"
- #include "components/signin/public/base/signin_buildflags.h"
-@@ -9174,6 +9175,11 @@ const FeatureEntry kFeatureEntries[] = {
-      flag_descriptions::kSearchReadyOmniboxDescription, kOsAndroid,
-      FEATURE_VALUE_TYPE(chrome::android::kSearchReadyOmniboxFeature)},
+diff --git a/chrome/browser/engagement/important_sites_util.cc b/chrome/browser/engagement/important_sites_util.cc
+--- a/chrome/browser/engagement/important_sites_util.cc
++++ b/chrome/browser/engagement/important_sites_util.cc
+@@ -29,6 +29,7 @@
+ #include "components/prefs/scoped_user_pref_update.h"
+ #include "components/site_engagement/content/site_engagement_score.h"
+ #include "components/site_engagement/content/site_engagement_service.h"
++#include "components/site_engagement/core/features.h"
+ #include "components/site_engagement/core/mojom/site_engagement_details.mojom.h"
+ #include "components/webapps/browser/banners/app_banner_settings_helper.h"
+ #include "net/base/registry_controlled_domains/registry_controlled_domain.h"
+@@ -343,6 +344,10 @@ void ImportantSitesUtil::RegisterProfilePrefs(
+ // static
+ std::set<std::string> ImportantSitesUtil::GetInstalledRegisterableDomains(
+     Profile* profile) {
++  if (!base::FeatureList::IsEnabled(site_engagement::features::kSiteEngagement)) {
++    std::set<std::string> empty_list;
++    return empty_list;
++  }
+   std::set<GURL> installed_origins = GetOriginsWithInstalledWebApps(profile);
+   std::set<std::string> registerable_domains;
  
-+    {"site-engagement",
-+     flag_descriptions::kSiteEngagementName,
-+     flag_descriptions::kSiteEngagementDescription, kOsAll,
-+     FEATURE_VALUE_TYPE(site_engagement::features::kSiteEngagement)},
+@@ -357,6 +362,10 @@ std::vector<ImportantDomainInfo>
+ ImportantSitesUtil::GetImportantRegisterableDomains(Profile* profile,
+                                                     size_t max_results) {
+   SCOPED_UMA_HISTOGRAM_TIMER("Storage.ImportantSites.GenerationTime");
++  if (!base::FeatureList::IsEnabled(site_engagement::features::kSiteEngagement)) {
++    std::vector<ImportantDomainInfo> empty_list;
++    return empty_list;
++  }
+   std::map<std::string, ImportantDomainInfo> important_info;
+   std::map<GURL, double> engagement_map;
+ 
+diff --git a/chrome/browser/media/media_engagement_service.cc b/chrome/browser/media/media_engagement_service.cc
+--- a/chrome/browser/media/media_engagement_service.cc
++++ b/chrome/browser/media/media_engagement_service.cc
+@@ -25,6 +25,7 @@
+ #include "components/history/core/browser/history_service.h"
+ #include "components/no_state_prefetch/browser/no_state_prefetch_contents.h"
+ #include "components/prefs/pref_service.h"
++#include "components/site_engagement/core/features.h"
+ #include "content/public/browser/web_contents.h"
+ #include "media/base/media_switches.h"
+ #include "url/origin.h"
+@@ -54,7 +55,8 @@ enum class MediaEngagementClearReason {
+ 
+ // static
+ bool MediaEngagementService::IsEnabled() {
+-  return base::FeatureList::IsEnabled(media::kRecordMediaEngagementScores);
++  return base::FeatureList::IsEnabled(media::kRecordMediaEngagementScores)
++           && base::FeatureList::IsEnabled(site_engagement::features::kSiteEngagement);
+ }
+ 
+ // static
+diff --git a/chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.cc b/chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.cc
+--- a/chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.cc
++++ b/chrome/browser/picture_in_picture/auto_picture_in_picture_tab_helper.cc
+@@ -46,7 +46,7 @@ AutoPictureInPictureTabHelper::AutoPictureInPictureTabHelper(
+           Profile::FromBrowserContext(web_contents->GetBrowserContext()))),
+       auto_blocker_(PermissionDecisionAutoBlockerFactory::GetForProfile(
+           Profile::FromBrowserContext(web_contents->GetBrowserContext()))),
+-      media_engagement_service_(MediaEngagementService::Get(
++      media_engagement_service_(!MediaEngagementService::IsEnabled() ? nullptr : MediaEngagementService::Get(
+           Profile::FromBrowserContext(web_contents->GetBrowserContext()))),
+       clock_(base::DefaultTickClock::GetInstance()) {
+   // `base::Unretained` is safe here since we own `tab_observer_helper_`.
+diff --git a/components/feature_engagement/internal/tracker_impl.cc b/components/feature_engagement/internal/tracker_impl.cc
+--- a/components/feature_engagement/internal/tracker_impl.cc
++++ b/components/feature_engagement/internal/tracker_impl.cc
+@@ -23,6 +23,7 @@
+ #include "base/task/single_thread_task_runner.h"
+ #include "base/time/clock.h"
+ #include "build/build_config.h"
++#include "components/site_engagement/core/features.h"
+ #include "components/feature_engagement/internal/availability_model_impl.h"
+ #include "components/feature_engagement/internal/blocked_iph_features.h"
+ #include "components/feature_engagement/internal/chrome_variations_configuration.h"
+@@ -290,6 +291,8 @@ TrackerImpl::TrackerImpl(
+ TrackerImpl::~TrackerImpl() = default;
+ 
+ void TrackerImpl::NotifyEvent(const std::string& event) {
++  if (!base::FeatureList::IsEnabled(site_engagement::features::kSiteEngagement))
++    return;
+   GetEventModelWriter()->IncrementEvent(event, time_provider_->GetCurrentDay());
+   stats::RecordNotifyEvent(event, configuration_.get(),
+                            event_model_provider_->IsReady());
+diff --git a/components/feature_engagement/public/feature_configurations.cc b/components/feature_engagement/public/feature_configurations.cc
+--- a/components/feature_engagement/public/feature_configurations.cc
++++ b/components/feature_engagement/public/feature_configurations.cc
+@@ -6,6 +6,7 @@
+ 
+ #include "base/strings/string_util.h"
+ #include "build/build_config.h"
++#include "components/site_engagement/core/features.h"
+ #include "components/feature_engagement/public/configuration.h"
+ #include "components/feature_engagement/public/event_constants.h"
+ #include "components/feature_engagement/public/feature_constants.h"
+@@ -118,6 +119,12 @@ std::optional<FeatureConfig> GetClientSideFeatureConfig(
+   }
+ 
+ #endif  // BUILDFLAG(IS_MAC) || BUILDFLAG(IS_LINUX) || BUILDFLAG(IS_WIN)
++  if (!base::FeatureList::IsEnabled(site_engagement::features::kSiteEngagement)) {
++    std::optional<FeatureConfig> config = FeatureConfig();
++    config->valid = false;
++    return config;
++  }
 +
- #if BUILDFLAG(IS_CHROMEOS_ASH)
-     {"use-multiple-overlays", flag_descriptions::kUseMultipleOverlaysName,
-      flag_descriptions::kUseMultipleOverlaysDescription, kOsCrOS,
-diff --git a/chrome/browser/flag_descriptions.cc b/chrome/browser/flag_descriptions.cc
---- a/chrome/browser/flag_descriptions.cc
-+++ b/chrome/browser/flag_descriptions.cc
-@@ -3461,6 +3461,11 @@ const char kSkipServiceWorkerFetchHandlerDescription[] =
-     "Skips starting the service worker and run the fetch handler if the fetch "
-     "handler is recognized as skippable.";
- 
-+const char kSiteEngagementName[] =
-+    "Enable site engagement feature";
-+const char kSiteEngagementDescription[] =
-+    "Site Engagement Service provides information about how engaged a user is with a origin; this affects which NTP tiles are automatically created.";
-+
- const char kWebSQLAccessName[] = "Allows access to WebSQL APIs";
- const char kWebSQLAccessDescription[] =
-     "The WebSQL API is enabled by default, but can be disabled here.";
-diff --git a/chrome/browser/flag_descriptions.h b/chrome/browser/flag_descriptions.h
---- a/chrome/browser/flag_descriptions.h
-+++ b/chrome/browser/flag_descriptions.h
-@@ -1975,6 +1975,9 @@ extern const char kReduceUserAgentPlatformOsCpuDescription[];
- extern const char kSkipServiceWorkerFetchHandlerName[];
- extern const char kSkipServiceWorkerFetchHandlerDescription[];
- 
-+extern const char kSiteEngagementName[];
-+extern const char kSiteEngagementDescription[];
-+
- extern const char kWebSQLAccessName[];
- extern const char kWebSQLAccessDescription[];
- 
+ #if BUILDFLAG(IS_WIN) || BUILDFLAG(IS_APPLE) || BUILDFLAG(IS_LINUX) || \
+     BUILDFLAG(IS_CHROMEOS)
+   if (kIPHPasswordsManagementBubbleAfterSaveFeature.name == feature->name) {
 diff --git a/components/site_engagement/content/site_engagement_score.cc b/components/site_engagement/content/site_engagement_score.cc
 --- a/components/site_engagement/content/site_engagement_score.cc
 +++ b/components/site_engagement/content/site_engagement_score.cc
-@@ -17,6 +17,7 @@
+@@ -19,6 +19,7 @@
  #include "components/content_settings/core/common/content_settings.h"
  #include "components/content_settings/core/common/content_settings_types.h"
  #include "components/content_settings/core/common/content_settings_utils.h"
 +#include "components/site_engagement/core/features.h"
  #include "components/site_engagement/content/engagement_type.h"
  #include "components/site_engagement/content/site_engagement_metrics.h"
- #include "components/variations/variations_associated_data.h"
-@@ -275,6 +276,10 @@ void SiteEngagementScore::Commit() {
+ #include "third_party/blink/public/mojom/site_engagement/site_engagement.mojom.h"
+@@ -276,6 +277,10 @@ void SiteEngagementScore::Commit() {
    if (!UpdateScoreDict(*score_dict_))
      return;
  
@@ -113,7 +188,7 @@ diff --git a/components/site_engagement/core/features.cc b/components/site_engag
 new file mode 100644
 --- /dev/null
 +++ b/components/site_engagement/core/features.cc
-@@ -0,0 +1,29 @@
+@@ -0,0 +1,30 @@
 +/*
 +    This file is part of Bromite.
 +
@@ -138,8 +213,9 @@ new file mode 100644
 +namespace site_engagement {
 +namespace features {
 +
-+const base::Feature kSiteEngagement{"SiteEngagement",
-+                                    base::FEATURE_ENABLED_BY_DEFAULT};
++SearchIt!_FEATURE(kSiteEngagement,
++                "SiteEngagement",
++                base::FEATURE_DISABLED_BY_DEFAULT);
 +
 +}  // namespace features
 +}  // namespace site_engagement
@@ -176,11 +252,25 @@ new file mode 100644
 +namespace features {
 +
 +// Enable site engagement
-+extern const base::Feature kSiteEngagement;
++BASE_DECLARE_FEATURE(kSiteEngagement);
 +
 +}  // namespace features
 +}  // namespace site_engagement
 +
 +#endif  // SITE_ENGAGEMENT_CORE_FEATURES_H_
+diff --git a/SearchIt!_flags/chrome/browser/about_flags_cc/Add-site-engagement-flag.inc b/SearchIt!_flags/chrome/browser/about_flags_cc/Add-site-engagement-flag.inc
+new file mode 100644
+--- /dev/null
++++ b/SearchIt!_flags/chrome/browser/about_flags_cc/Add-site-engagement-flag.inc
+@@ -0,0 +1,10 @@
++#ifdef FLAG_SECTION
++
++    {"site-engagement",
++     "Enable site engagement feature",
++     "Site Engagement Service provides information about how "
++     "engaged a user is with a origin; this affects which NTP "
++     "tiles are automatically created.", kOsAll,
++     FEATURE_VALUE_TYPE(site_engagement::features::kSiteEngagement)},
++
++#endif
 --
-2.25.1

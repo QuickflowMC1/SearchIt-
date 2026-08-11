@@ -1,228 +1,165 @@
-[![Stand With Ukraine](./banner2-direct.svg)](https://stand-with-ukraine.pp.ua/)
-
-# Bromite - Take back your browser
-<a href="https://github.com/bromite/bromite/releases/latest">
-  <img src="https://www.bromite.org/release.svg" alt="current Bromite release" title="current Bromite release" /> </a>
-<a href="https://github.com/bromite/bromite/blob/master/LICENSE">
-  <img src="https://www.bromite.org/license.svg" alt="GNU GPL v3" title="GNU VPL v3" />
-</a> <br>
-<a href="https://www.bromite.org">
-  <img title="Bromite - take back your browser!" src="https://www.bromite.org/android-icon-192x192.png" width="96" alt="Bromite" />
+﻿<a href="https://github.com/uazo/SearchIt!/releases/latest">
+  <img src="https://img.shields.io/github/v/release/uazo/SearchIt!" alt="current SearchIt! release" title="current SearchIt! release" />
 </a>
+<br>
 
-Bromite is a [Chromium](https://www.chromium.org/Home) fork with support for ad blocking and enhanced privacy.
+[![Build SearchIt!](https://github.com/uazo/SearchIt!/actions/workflows/build_SearchIt!.yaml/badge.svg)](https://github.com/uazo/SearchIt!/actions/workflows/build_SearchIt!.yaml)
 
-Bromite is only available for Android Marshmallow (v6.0, API level 23) and above.
+# SearchIt! (a Bromite fork) - Take back your browser
 
-<img src="https://fdroid.bromite.org/fdroid/bromite_bromite_gh_downloads.svg" alt="Downloads on Github" title="Downloads on Github" />
+<a href="https://www.SearchIt!.org">
+  <img title="SearchIt! - take back your browser!" src="https://www.SearchIt!.org/app_icon.png" width="96" alt="Bromite" />
+</a>
+<br>
 
-For the Frequently Asked Questions see [F.A.Q.](./FAQ.md).
+SearchIt! is a [Chromium](https://www.chromium.org/Home) fork based on [Bromite](https://github.com/bromite/bromite) with built-in support for ad blocking and an eye for privacy.
 
-For documentation see the [wiki](https://github.com/bromite/bromite/wiki).
+SearchIt! is available for Android arm64-v8a, arm32-v7a and x86_64, Android 10 and above, Windows and Linux 64bit.
 
 # Goals
 
-Bromite aims at providing a no-clutter browsing experience without privacy-invasive features and with the addition of a fast ad-blocking engine.
-Minimal UI changes are applied to help curbing the idea of "browser as an advertisement platform".
+SearchIt!'s goal is to
+- limit the features built into the browser that can be used as a platform for tracking users' habits, and, if it is not technically possible, disable them and leave it up to the user to choose whether to re-enable them
+- limit the close integration between the browser and its manufacturer
+- not let the excellent research work done by csagan5 with Bromite be lost
 
-# Donate
-
-Please donate to support development of Bromite and the costs for the build system.
-
-## &rarr; Support development with a donation
-
-Patreon: https://www.patreon.com/csagan5
-
-<a href="bitcoin:bc1qlx7h0lj9z88g2xfeuwsrtfs77sxuhrxf2t28sw">BTC donations address</a>: `bc1qlx7h0lj9z88g2xfeuwsrtfs77sxuhrxf2t28sw`
-
-ETH donations address: `0x5d392F8FBf3465afe05B1Adc575e248D33B891F6`
-
-# Features
-
-* customizable adblock filters via user-provided URL (see https://www.bromite.org/custom-filters)
-* automatically updated adblock filters
-* remove click-tracking and AMP from search results
-* DNS-over-HTTPS support with any valid IETF DoH endpoint
-* always-incognito mode
-* disable all field trials permanently
-* disable smart search by default, allow web search from incognito mode
-* always-visible cookies, javascript and ads site settings from address bar popup
-* remove Play integration binary blobs
-* use [CFI](https://en.wikipedia.org/wiki/Control-flow_integrity) on all architectures except x86
-* enable trivial auto var init
-* disable media router and remoting by default
-* disable dynamic module loading
-* show warnings for TLSv1.0/TLSv1.1 pages
-* enable site-per-process isolation for all devices with memory > 1GB
-* completely remove safe browsing and other privacy-unfriendly features
-* [proxy configuration page](https://github.com/bromite/bromite/wiki/ProxyConfiguration) with PAC and custom proxy lists support
-* settings to disable custom intents and clear session on exit
-* flags to toggle anti-fingerprinting mitigations for canvas, audio, client rects, webGL and sensor APIs (see full list below for all the new flags)
-* use frozen User-Agent to conceal real model and browser version
-* privacy enhancement patches from [Iridium](https://iridiumbrowser.de/), [Inox patchset](https://github.com/gcarq/inox-patchset), [Brave](https://brave.com/) and [ungoogled-chromium](https://github.com/Eloston/ungoogled-chromium) projects
-* security enhancement patches from [GrapheneOS](https://github.com/GrapheneOS) project
-* disable scroll-to-text-fragment
-* reduced referer granularity
-* block gateway attacks via websockets (partial fix, see [this upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=590714))
-* use 64-bit ABI for webview processes
-* make all favicon requests on-demand ([supercookie](https://supercookie.me/) mitigation)
-* enable all network isolation features (`PartitionConnectionsByNetworkIsolationKey`, `PartitionHttpServerPropertiesByNetworkIsolationKey`, `SplitHostCacheByNetworkIsolationKey`, `AppendFrameOriginToNetworkIsolationKey`, `SplitCacheByNetworkIsolationKey`, `UseRegistrableDomainInNetworkIsolationKey`, `PartitionSSLSessionsByNetworkIsolationKey`, `PartitionExpectCTStateByNetworkIsolationKey`, `PartitionDomainReliabilityByNetworkIsolationKey`)
-* ignore enterprise policies that disallow secure DNS
-* ask permission to play protected media
-* disable the DIAL repeating discovery
-* disable RTCGetCurrentBrowsingContextMedia by default
-* disable FLoC and privacy sandbox by default
-* disable feeds
-* disable reporting of certificate errors
-* use pre-defined phone model for client hints and Javascript
-* allow forcing external links to open in incognito
-* disable AGSA by default
-* flag to enable Certificate Transparency
-* allow adding search engines from incognito mode
-* disable predictors
-* disable supervised users
-* disable safety check
-* disable capability to block `view-source:` URLs
-* disable `SegmentationPlatformFeature`, `OptimizationHints`, client hint headers
-* disable `AsyncDNS` by default
-* customize history expiration threshold
-* disable idle detection
-* HTTPS-only mode enabled by default
-* disable TLS resumption by default
-* partition DoH requests by top-frame NIK
-* strict site isolation and strict origin isolation
-
-## Features not related to privacy
-* browser automatic updates, enabled by default
-* native Android autofill support
-* import/export bookmarks
-* bookmark all tabs from tabs regroup menu
-* allow playing videos in background tabs and disable pause on switching tabs
-* all codecs included (proprietary, open H.264 etc.)
-* [AV1 codec support](https://github.com/bromite/bromite/wiki/AV1-support)
-* [dav1d](https://code.videolan.org/videolan/dav1d) decoder enabled by default
-* built with official speed optimizations
-* increase number of autocomplete matches from 5 to 10
-* allow changing default download storage location
-* do not ignore save prompt for users without SD cards
-* disable articles and increase number of icons on new tab page
-* adding an URL as bookmark will clear its blocked status for the NTP tiles
-* history support in incognito mode
-* view source of pages
-* sticky desktop mode setting
-* mobile/desktop user agent customization
-* accessibility preference to force tablet UI
-* use Alt+D to focus address bar
-* allow sharing to Bromite
-* UI for crash information collection
-* allow OpenSearch search engine detection in incognito
-* allow OpenSearch search engine detection with paths
-* keyboard dictionary hints in address bar
-* always allow `view-source:` URLs
-* allow moving navigation bar to bottom
-* add option to use home page as NTP
-
-You can inspect all functionality/privacy changes by reading the [patches](https://github.com/bromite/bromite/tree/master/build/patches) and/or the [CHANGELOG](./CHANGELOG.md).
-
-### Flags
-
-Flags which have been retired from upstream Chromium but are still available in Bromite.
-
-* `#pull-to-refresh`
-* `#enable-search-ready-omnibox`
-* `#darken-websites-checkbox-in-themes-setting`
-* `#simplified-ntp`, enabled by default
-* `#enable-text-fragment-anchor`, disabled by default
-* `#num-raster-threads`
-* `#enable-image-reader`, enabled by default
-* `#enable-tab-groups` and `#enable-tab-groups-ui-improvements`
-* `#offline-indicator-v2`
-
-New flags:
-
-* `#fingerprinting-canvas-image-data-noise`, `#fingerprinting-client-rects-noise` and `#fingerprinting-canvas-measuretext-noise`, enabled by default
-* `#incognito-screenshot`, disabled by default
-* `#max-connections-per-host`
-* `#resume-background-video`
-* `#ipv6-probing`
-* `#enable-device-motion` and `#enable-device-orientation`
-* `#show-legacy-tls-warnings`
-* `#save-data-header`, disabled by default
-* `#export-bookmarks-use-saf`, disabled by default
-* `#allow-user-certificates`, disabled by default
-* `#cleartext-permitted`, enabled by default, can be used to disable all cleartext-HTTP traffic
-* `#omnibox-autocomplete-filtering`, can be used to restrict omnibox autocomplete results
-* `#disable-external-intent-requests`, can be used to disable opening any external app for any URL
-* `#enable-userscripts-log`, see https://github.com/bromite/bromite/wiki/UserScripts#flags
-* `#certificate-transparency-enabled`, enabled by default; see https://chromium.googlesource.com/chromium/src/+/master/net/docs/certificate-transparency.md
-* `#move-top-toolbar-to-bottom`, disabled by default
-* `#site-engagement`, enabled by default
-* `#offline-pages-auto-save`, disabled by default, allows auto-saving of pages when device goes offline
-* `#adaptive-button-in-top-toolbar-customization`, disabled by default, allows having a new tab or share button on the address bar
-
-### Site settings
-
-* webGL, disabled by default
-* images, enabled by default
-* Javascript JIT, disabled by default
-* timezone customization override
-* autoplay, disabled by default
-* webRTC, disabled by default
+In addition, SearchIt! would like to promote greater integration with other non-profit, open source browsers, encouraging closer collaboration with others, and attempt to integrate them directly into Chromium once they have reached an appropriate level of maturity.
 
 # Privacy limitations
 
-Bromite's privacy features, including anti-fingerprinting mitigations (which are not comprehensive), **are not to be considered useful for journalists and people living in countries with freedom limitations**, please look at [Tor Browser](https://www.torproject.org/download/) in such cases.
+SearchIt!'s privacy features, including anti-fingerprinting mitigations (which are not comprehensive), **are not to be considered useful for journalists and people living in countries with freedom limitations**, please look at [Tor Browser](https://www.torproject.org/download/) in such cases (better to use the desktop version).
+Please note that this project is not free of bugs and that changing the behaviour of a browser can be risky and not without problems.
+
+# Docs
+- [Privacy Policy](https://github.com/uazo/SearchIt!/blob/master/docs/PRIVACY_POLICY.md)
+- [Features](https://github.com/uazo/SearchIt!/blob/master/docs/FEATURES.md)
+- [Faqs](https://github.com/uazo/SearchIt!/blob/master/docs/FAQ.md)
+- [How to build](https://github.com/uazo/SearchIt!/blob/master/docs/HOW_TO_BUILD.md)
+- [Patch list](https://github.com/uazo/SearchIt!/blob/master/docs/PATCHES.md)
 
 # Releases
 
-All built versions are available as [releases](https://github.com/bromite/bromite/releases); the [official website](https://www.bromite.org/) points to those releases and - when browsing via Android - it will automatically highlight the one apt for your device (or none otherwise).
+All built versions are available as [releases](https://github.com/uazo/SearchIt!/releases).
 
-Each tag corresponds to a Chromium Stable release tag.
+SearchIt! is currently built for ARM, ARM64, Android x86, Windows x64 and Linux.
 
-Bromite is currently built for ARM, ARM64 and x86 and for the Android SDK version 23+; [Bromite SystemWebView](https://www.bromite.org/system_web_view) is provided as well (SDK23+).
-For every Bromite build you can always find a matching [vanilla Chromium](https://www.bromite.org/chromium) build which is used for example to verify which issues are specific to Bromite or not.
+The following files will be present for each release:
 
-You will automatically receive notifications about new updates (and be able to install them) via the auto updater functionality (enabled by default), see [related wiki page](https://github.com/bromite/bromite/wiki/AutomaticUpdates).
+#### SearchIt! apk for android:
+- [arm64_ChromePublic.apk](https://github.com/uazo/SearchIt!/releases/latest/download/arm64_ChromePublic.apk)
+- [arm_ChromePublic.apk](https://github.com/uazo/SearchIt!/releases/latest/download/arm_ChromePublic.apk)
+- [x64_ChromePublic.apk](https://github.com/uazo/SearchIt!/releases/latest/download/x64_ChromePublic.apk)
 
-All official releases are also available through the [official third-party F-Droid repository](https://www.bromite.org/fdroid).
+#### Linux package:
+- [chrome-lin64.tar.gz](https://github.com/uazo/SearchIt!/releases/latest/download/chrome-lin64.tar.gz)
 
-## Integrity and authenticity
+#### Windows package:
+- [chrome-win.zip](https://github.com/uazo/SearchIt!/releases/latest/download/chrome-win.zip)
 
-You can verify the integrity of a downloaded APK file from this project with any `sha256sum`-compatible tool by downloading the corresponding `brm_X.Y.Z.sha256.txt` or `chr_X.Y.Z.sha256.txt` file, where X.Y.Z is the release version number. Example:
+#### Debugging symbols and proguard file for java stacktrace deobfuscation
+- x64_ChromePublic.apk.mapping
+- arm64_ChromePublic.apk.mapping
+- arm64_symbols.zip
+
+#### Build time analysis file:
+- arm64_ninja_log_trace.html
+
+#### Chrlauncher autoupdate file:
+- updateurl.txt
+
+Additional files are also available: please note that these files are created by an [additional build](https://github.com/uazo/SearchIt!/actions/workflows/build_additional_targets.yaml) separate from the release process, and therefore may not be immediately available.
+
+#### SearchIt! System WebView apk for android:
+- arm64_SystemWebView.apk
+- x64_SystemWebView.apk
+
+#### Vanilla Chromium for android (used for tests):
+- arm64_VanillaChromium.apk
+- arm_VanillaChromium.apk
+- x64_VanillaChromium.apk
+
+#### SystemWebView Shell (used for tests)
+- arm64_SystemWebViewShell.apk
+- x64_SystemWebViewShell.apk
+
+### F-droid
+
+Official F-droid repo url:
+https://www.SearchIt!.org/fdroid/repo/?fingerprint=49F37E74DEE483DCA2B991334FB5A0200787430D0B5F9A783DD5F13695E9517B
+
+### Auto-update in Android
+
+You will automatically receive notifications about new updates (and be able to install them) via the auto updater functionality.
+You will be asked whether you want to activate the functionality during the first start-up.
+
+### Auto-update setup for Windows
+
+1. Download https://github.com/henrypp/chrlauncher/releases
+2. Create a `chrlauncher.ini`
+
 ```
-$ sha256sum --check brm_68.0.3440.54.sha256.txt
-arm64_SystemWebView.apk: OK
-arm64_ChromePublic.apk: OK
-arm64_ChromeModernPublic.apk: OK
+[chrlauncher]
+
+# Custom Chromium update URL (string):
+ChromiumUpdateUrl=https://github.com/uazo/SearchIt!/releases/latest/download/updateurl.txt
+
+# Command line for Chromium (string):
+# note --user-data-dir= works better if path is absolute
+# See here: http://peter.sh/experiments/chromium-command-line-switches/
+ChromiumCommandLine=--user-data-dir="%LOCALAPPDATA%\SearchIt!\User Data" --no-default-browser-check
+
+# to enable full logging in c:\temp\log.txt (daily rotate, no automatic deletion)
+# ChromiumCommandLine=--enable-logging --v=0 --log-file=C:\temp\log.txt --user-data-dir=".\User Data" --no-default-browser-check
+
+# Chromium executable file name (string):
+ChromiumBinary=chrome.exe
+
+# Chromium binaries directory (string):
+# Relative (to chrlauncher directory) or full path (env. variables supported).
+ChromiumDirectory=.\bin
 ```
+To prevent deletion by Microsoft Defender each time the browser is updated, check the `user-data-dir` folder by modifying it accordingly.
 
-You can verify authenticity, e.g. that the author ([csagan5](https://github.com/csagan5)) released the file, by using gpg2:
+### Enable network process sandbox in windows
+I don't include any setups because I don't like the experience of not knowing what they do, so you must manually run this command on first installation:
 ```
-$ gpg2 --quiet --verify brm_68.0.3440.54.sha256.txt.asc
-gpg: assuming signed data in 'brm_68.0.3440.54.sha256.txt'
-gpg: Signature made Sun 08 Jul 2018 04:22:52 PM CEST using RSA key ID D85DC0C5
-gpg: Good signature from "csagan5 <32685696+csagan5@users.noreply.github.com>"
+cd <where_is_the_exe>
+icacls . /grant "*S-1-15-2-2:(OI)(CI)(RX)"
 ```
+see https://github.com/uazo/bromite-buildtools/issues/51
 
-You can download csagan5's public GnuPG key from here: [csagan5.asc](./csagan5.asc).
+### Enable AppContainer for renderer process in windows
+you can activate (highly recommended) the 'RendererAppContainer' flag from the command line with
+```
+  --enable-features=RendererAppContainer
+```
+In this case, it is also necessary to run icacls as indicated above.
 
-# How to build
+### Auto-update setup for linux
+working in progress in https://github.com/uazo/SearchIt!/issues/771
 
-The [Bromite main repository](https://github.com/bromite/bromite) contains tags for each corresponding Chromium release (see https://chromium.googlesource.com/chromium/src.git).
+### Making SearchIt! work in Ubuntu 24.04 and its derivatives (kubuntu, etc)
+This happens because, starting with Ubuntu 24.04, Apparmor
+restricts the use of unprivileged user namespaces. To fix this, you have several options:
+#### 1. Creating an apparmor profile for SearchIt!
+Create `/etc/apparmor.d/chrome`, and write:
+```
+abi <abi/4.0>,
+include <tunables/global>
 
-Please refer to [official Chromium build documentation](https://www.chromium.org/developers/how-tos/get-the-code) to get started on how to build Chromium; if you can build Chromium for Android, you can build Bromite.
+profile SearchIt! /home/user/SearchIt!/chrome-lin/chrome flags=(unconfined) {
+  userns,
 
-The Chromium version tag used as base for the patches is available here: [RELEASE](./build/RELEASE); this is always corresponding to the git tag for every release.
-The GN args used to build Bromite are available here: [bromite.gn_args](./build/bromite.gn_args).
-The patches are to be applied second the order specified in the `bromite_patches_list.txt` file (you can use `git am`).
+  include if exists <local/chrome>
+}
+```
+replacing the SearchIt! binary path with where you have placed SearchIt!.
 
-NOTE: no official support is provided for builds.
-
-## How to build the filters
-
-See upstream documentation: https://github.com/chromium/chromium/blob/master/components/subresource_filter/FILTER_LIST_GENERATION.md
-
-Bromite uses an unindexed filter file, which is periodically published at https://github.com/bromite/filters
+Now, run `sudo apparmor_parser -r /etc/apparmor.d/SearchIt!` to apply the changes.
+#### 2. Disabling the restriction until next reboot
+`sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0`
+#### 3. Disabling the restriction permanently
+Add `kernel.apparmor_restrict_unprivileged_userns=0` to the file `/etc/sysctl.d/60-apparmor-namespace.conf`.  Create the file if not exists.
 
 # Contributing
 
@@ -230,32 +167,37 @@ Please submit issues following the issue template; beware that GitHub does not d
 
 Patches are welcome and accepted if they match the project goals.
 
-For any usage or development discussion please use GitHub Discussions: https://github.com/bromite/bromite/discussions
+If you want to help me, [here](https://github.com/uazo/SearchIt!/blob/master/docs/HELP_ME_PLEASE.md) is the list of things I would need.
+
+For any usage or development discussion please use GitHub Discussions: https://github.com/uazo/SearchIt!/discussions
 
 # Credits
 
 * [Chromium project](https://www.chromium.org/Home) and developers
-* [Iridium project](https://github.com/iridium-browser) for some patches
-* [ungoogled-chromium](https://github.com/Eloston/ungoogled-chromium) for some patches
-* [ungoogled-chromium-android](https://github.com/ungoogled-software/ungoogled-chromium-android) for some patches
-* [GrapheneOS](https://github.com/GrapheneOS) for some security patches
-* [Inox patchset](https://github.com/gcarq/inox-patchset) for some patches (via ungoogled-chromium)
-* [Brave Browser](https://github.com/brave/brave-core) for some patches
-* [Vadim Pleshkov](http://vadimpleshkov.me/) for Bromite's logo
+* [Bromite](https://github.com/bromite/bromite)
+  * [Iridium project](https://github.com/iridium-browser) for some patches
+  * [ungoogled-chromium](https://github.com/Eloston/ungoogled-chromium) for some patches
+  * [ungoogled-chromium-android](https://github.com/ungoogled-software/ungoogled-chromium-android) for some patches
+  * [GrapheneOS](https://github.com/GrapheneOS) for some security patches
+  * [Inox patchset](https://github.com/gcarq/inox-patchset) for some patches (via ungoogled-chromium)
+  * [Brave Browser](https://github.com/brave/brave-core) for some patches
 
-# Filters credits
-* [EasyList](https://easylist.to/#easylist)
-* [EasyPrivacy](https://easylist.to/#easyprivacy)
-* [uBlock Origin](https://github.com/uBlockOrigin)
-* [Peter Lowe's Ad and tracking server list](https://pgl.yoyo.org/adservers/)
+thanks to [austinhuang0131](https://github.com/austinhuang0131) for the svg icon
 
-The URLs of the lists used are available at: https://github.com/bromite/filters/blob/master/lists.txt
+# Donate
+
+If you want, you can donate to support SearchIt! development through [paypal](https://www.paypal.com/pools/c/9e5lO2OIzb).
+
+Current link:
+- https://www.paypal.com/pools/c/9hEHZ6tElk
+
+Historical fundraisings links:
+- https://www.paypal.com/pools/c/9cwNgAQhRL
+- https://www.paypal.com/pools/c/9e5lO2OIzb
 
 # License
 
-The patches published as part of the Bromite project are released under [GNU GPL v3](./LICENSE).
-
-[version-image]: https://img.shields.io/github/release/bromite/bromite.svg?style=flat-square
-[version-url]: https://github.com/bromite/bromite/releases/latest
-[license-image]: https://img.shields.io/github/license/bromite/bromite.svg
-[license-url]: https://github.com/bromite/bromite/blob/master/LICENSE
+SearchIt! is published under [GNU GPL v3](./LICENSE).
+The patches published as part of the Bromite project are released under GNU GPL v3 only.
+SearchIt! specific patches are under the GNU GPL-2+ licence.
+Each individual patch contains specific information on the licence used.

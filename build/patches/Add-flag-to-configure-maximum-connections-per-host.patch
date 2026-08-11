@@ -1,4 +1,4 @@
-From: csagan5 <32685696+csagan5@users.noreply.github.com>
+﻿From: csagan5 <32685696+csagan5@users.noreply.github.com>
 Date: Sun, 8 Jul 2018 22:42:04 +0200
 Subject: Add flag to configure maximum connections per host
 
@@ -8,93 +8,13 @@ with limited CPU/memory resources and it is disabled by default.
 
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- chrome/browser/about_flags.cc                   |  8 ++++++++
- chrome/browser/flag_descriptions.cc             |  4 ++++
- chrome/browser/flag_descriptions.h              |  3 +++
- .../common/network_features.cc                  |  3 +++
- .../common/network_features.h                   |  4 ++++
  .../common/network_switch_list.h                |  4 ++++
  .../spoof_checks/top_domains/BUILD.gn           |  1 +
- net/socket/client_socket_pool_manager.cc        | 17 +++++++++++++++++
- 8 files changed, 44 insertions(+)
+ ...o-configure-maximum-connections-per-host.inc | 17 +++++++++++++++++
+ net/socket/client_socket_pool_manager.cc        | 16 ++++++++++++++++
+ 4 files changed, 38 insertions(+)
+ create mode 100644 SearchIt!_flags/chrome/browser/about_flags_cc/add-flag-to-configure-maximum-connections-per-host.inc
 
-diff --git a/chrome/browser/about_flags.cc b/chrome/browser/about_flags.cc
---- a/chrome/browser/about_flags.cc
-+++ b/chrome/browser/about_flags.cc
-@@ -1040,6 +1040,11 @@ const FeatureEntry::Choice kForceColorProfileChoices[] = {
-      switches::kForceDisplayColorProfile, "hdr10"},
- };
- 
-+const FeatureEntry::Choice kMaxConnectionsPerHostChoices[] = {
-+    {features::kMaxConnectionsPerHostChoiceDefault, "", ""},
-+    {features::kMaxConnectionsPerHostChoice15, switches::kMaxConnectionsPerHost, "15"},
-+};
-+
- const FeatureEntry::Choice kMemlogModeChoices[] = {
-     {flags_ui::kGenericExperimentChoiceDisabled, "", ""},
-     {flag_descriptions::kMemlogModeMinimal, heap_profiling::kMemlogMode,
-@@ -4884,6 +4889,9 @@ const FeatureEntry kFeatureEntries[] = {
-      flag_descriptions::kAndroidPictureInPictureAPIName,
-      flag_descriptions::kAndroidPictureInPictureAPIDescription, kOsAndroid,
-      FEATURE_VALUE_TYPE(media::kPictureInPictureAPI)},
-+    {"max-connections-per-host", flag_descriptions::kMaxConnectionsPerHostName,
-+     flag_descriptions::kMaxConnectionsPerHostDescription, kOsAll,
-+     MULTI_VALUE_TYPE(kMaxConnectionsPerHostChoices)},
-     {"reengagement-notification",
-      flag_descriptions::kReengagementNotificationName,
-      flag_descriptions::kReengagementNotificationDescription, kOsAndroid,
-diff --git a/chrome/browser/flag_descriptions.cc b/chrome/browser/flag_descriptions.cc
---- a/chrome/browser/flag_descriptions.cc
-+++ b/chrome/browser/flag_descriptions.cc
-@@ -1875,6 +1875,10 @@ const char kUnthrottledNestedTimeoutDescription[] =
-     "websites abusing the API will still eventually have their setTimeouts "
-     "clamped.";
- 
-+const char kMaxConnectionsPerHostName[] = "Maximum connections per host";
-+const char kMaxConnectionsPerHostDescription[] =
-+     "Customize maximum allowed connections per host.";
-+
- const char kMediaRouterCastAllowAllIPsName[] =
-     "Connect to Cast devices on all IP addresses";
- const char kMediaRouterCastAllowAllIPsDescription[] =
-diff --git a/chrome/browser/flag_descriptions.h b/chrome/browser/flag_descriptions.h
---- a/chrome/browser/flag_descriptions.h
-+++ b/chrome/browser/flag_descriptions.h
-@@ -1050,6 +1050,9 @@ extern const char kLogJsConsoleMessagesDescription[];
- extern const char kUnthrottledNestedTimeoutName[];
- extern const char kUnthrottledNestedTimeoutDescription[];
- 
-+extern const char kMaxConnectionsPerHostName[];
-+extern const char kMaxConnectionsPerHostDescription[];
-+
- extern const char kMediaRouterCastAllowAllIPsName[];
- extern const char kMediaRouterCastAllowAllIPsDescription[];
- 
-diff --git a/components/network_session_configurator/common/network_features.cc b/components/network_session_configurator/common/network_features.cc
---- a/components/network_session_configurator/common/network_features.cc
-+++ b/components/network_session_configurator/common/network_features.cc
-@@ -8,4 +8,7 @@
- 
- namespace features {
- 
-+const char kMaxConnectionsPerHostChoiceDefault[] = "6",
-+                 kMaxConnectionsPerHostChoice15[] = "15";
-+
- }  // namespace features
-diff --git a/components/network_session_configurator/common/network_features.h b/components/network_session_configurator/common/network_features.h
---- a/components/network_session_configurator/common/network_features.h
-+++ b/components/network_session_configurator/common/network_features.h
-@@ -10,6 +10,10 @@
- 
- namespace features {
- 
-+NETWORK_SESSION_CONFIGURATOR_EXPORT extern const char kMaxConnectionsPerHostChoiceDefault[],
-+                 kMaxConnectionsPerHostChoice6[],
-+                 kMaxConnectionsPerHostChoice15[];
-+
- }  // namespace features
- 
- #endif  // COMPONENTS_NETWORK_SESSION_CONFIGURATOR_COMMON_NETWORK_FEATURES_H_
 diff --git a/components/network_session_configurator/common/network_switch_list.h b/components/network_session_configurator/common/network_switch_list.h
 --- a/components/network_session_configurator/common/network_switch_list.h
 +++ b/components/network_session_configurator/common/network_switch_list.h
@@ -107,12 +27,12 @@ diff --git a/components/network_session_configurator/common/network_switch_list.
 +NETWORK_SWITCH(kMaxConnectionsPerHost, "max-connections-per-host")
 +
  // Ignores certificate-related errors.
- NETWORK_SWITCH(kIgnoreCertificateErrors, "ignore-certificate-errors")
- 
+ // Note: In tests using net::EmbeddedTestServer with a custom hostname not
+ // covered by the default test certs, using this switch is usually incorrect.
 diff --git a/components/url_formatter/spoof_checks/top_domains/BUILD.gn b/components/url_formatter/spoof_checks/top_domains/BUILD.gn
 --- a/components/url_formatter/spoof_checks/top_domains/BUILD.gn
 +++ b/components/url_formatter/spoof_checks/top_domains/BUILD.gn
-@@ -89,6 +89,7 @@ executable("make_top_domain_list_variables") {
+@@ -90,6 +90,7 @@ executable("make_top_domain_list_variables") {
      "//base:i18n",
      "//components/url_formatter/spoof_checks/common_words:common",
      "//third_party/icu",
@@ -120,10 +40,32 @@ diff --git a/components/url_formatter/spoof_checks/top_domains/BUILD.gn b/compon
    ]
    if (is_ios) {
      frameworks = [ "UIKit.framework" ]
+diff --git a/SearchIt!_flags/chrome/browser/about_flags_cc/add-flag-to-configure-maximum-connections-per-host.inc b/SearchIt!_flags/chrome/browser/about_flags_cc/add-flag-to-configure-maximum-connections-per-host.inc
+new file mode 100644
+--- /dev/null
++++ b/SearchIt!_flags/chrome/browser/about_flags_cc/add-flag-to-configure-maximum-connections-per-host.inc
+@@ -0,0 +1,17 @@
++#ifdef FEATURE_PARAM_SECTION
++
++const FeatureEntry::Choice kMaxConnectionsPerHostChoices[] = {
++    {/*features::kMaxConnectionsPerHostChoiceDefault*/ "6", "", ""},
++    {/*features::kMaxConnectionsPerHostChoice15*/ "15", switches::kMaxConnectionsPerHost, "15"},
++};
++
++#endif
++
++#ifdef FLAG_SECTION
++
++    {"max-connections-per-host",
++     "Maximum connections per host",
++     "Customize maximum allowed connections per host.", kOsAll,
++     MULTI_VALUE_TYPE(kMaxConnectionsPerHostChoices)},
++
++#endif
 diff --git a/net/socket/client_socket_pool_manager.cc b/net/socket/client_socket_pool_manager.cc
 --- a/net/socket/client_socket_pool_manager.cc
 +++ b/net/socket/client_socket_pool_manager.cc
-@@ -19,6 +19,10 @@
+@@ -22,6 +22,10 @@
  #include "net/socket/client_socket_handle.h"
  #include "net/socket/client_socket_pool.h"
  #include "net/socket/connect_job.h"
@@ -132,14 +74,13 @@ diff --git a/net/socket/client_socket_pool_manager.cc b/net/socket/client_socket
 +#include "base/command_line.h"
 +#include "base/strings/string_number_conversions.h"
  #include "net/ssl/ssl_config.h"
- #include "third_party/abseil-cpp/absl/types/optional.h"
  #include "url/gurl.h"
-@@ -172,6 +176,19 @@ void ClientSocketPoolManager::set_max_sockets_per_pool(
- int ClientSocketPoolManager::max_sockets_per_group(
+ #include "url/scheme_host_port.h"
+@@ -169,6 +173,18 @@ void ClientSocketPoolManager::set_socket_soft_cap_per_pool_for_test(
+ // static
+ size_t ClientSocketPoolManager::max_sockets_per_group(
      HttpNetworkSession::SocketPoolType pool_type) {
-   DCHECK_LT(pool_type, HttpNetworkSession::NUM_SOCKET_POOL_TYPES);
-+
-+  if (pool_type == HttpNetworkSession::NORMAL_SOCKET_POOL) {
++  if (pool_type == net::HttpNetworkSession::SocketPoolType::kNormal) {
 +      int maxConnectionsPerHost = 0;
 +      auto value = base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(switches::kMaxConnectionsPerHost);
 +      if (!value.empty() && !base::StringToInt(value, &maxConnectionsPerHost)) {
@@ -151,8 +92,7 @@ diff --git a/net/socket/client_socket_pool_manager.cc b/net/socket/client_socket
 +      // fallthrough for default value
 +  }
 +
-   return g_max_sockets_per_group[pool_type];
+   return g_max_sockets_per_group[std::to_underlying(pool_type)];
  }
  
 --
-2.25.1

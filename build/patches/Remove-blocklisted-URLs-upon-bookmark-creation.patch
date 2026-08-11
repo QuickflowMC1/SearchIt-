@@ -4,29 +4,18 @@ Subject: Remove blocklisted URLs upon bookmark creation
 
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- .../chromium/chrome/browser/app/ChromeActivity.java |  1 -
- .../chrome/browser/bookmarks/TabBookmarker.java     | 13 +++++++++++++
- 2 files changed, 13 insertions(+), 1 deletion(-)
+ .../chrome/browser/bookmarks/TabBookmarker.java    | 14 ++++++++++++++
+ 1 file changed, 14 insertions(+)
 
-diff --git a/chrome/android/java/src/org/chromium/chrome/browser/app/ChromeActivity.java b/chrome/android/java/src/org/chromium/chrome/browser/app/ChromeActivity.java
---- a/chrome/android/java/src/org/chromium/chrome/browser/app/ChromeActivity.java
-+++ b/chrome/android/java/src/org/chromium/chrome/browser/app/ChromeActivity.java
-@@ -293,7 +293,6 @@ public abstract class ChromeActivity<C extends ChromeActivityComponent>
-     private TabContentManager mTabContentManager;
- 
-     private UmaSessionStats mUmaSessionStats;
--    private ContextReporter mContextReporter;
- 
-     private boolean mPartnerBrowserRefreshNeeded;
- 
-diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bookmarks/TabBookmarker.java b/chrome/android/java/src/org/chromium/chrome/browser/bookmarks/TabBookmarker.java
---- a/chrome/android/java/src/org/chromium/chrome/browser/bookmarks/TabBookmarker.java
-+++ b/chrome/android/java/src/org/chromium/chrome/browser/bookmarks/TabBookmarker.java
-@@ -20,6 +20,11 @@ import org.chromium.components.bookmarks.BookmarkItem;
- import org.chromium.components.bookmarks.BookmarkType;
- import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
+diff --git a/chrome/browser/bookmarks/android/java/src/org/chromium/chrome/browser/bookmarks/TabBookmarker.java b/chrome/browser/bookmarks/android/java/src/org/chromium/chrome/browser/bookmarks/TabBookmarker.java
+--- a/chrome/browser/bookmarks/android/java/src/org/chromium/chrome/browser/bookmarks/TabBookmarker.java
++++ b/chrome/browser/bookmarks/android/java/src/org/chromium/chrome/browser/bookmarks/TabBookmarker.java
+@@ -23,6 +23,12 @@ import org.chromium.components.browser_ui.bottomsheet.BottomSheetController;
+ import java.util.Objects;
+ import java.util.function.Supplier;
  
 +import org.chromium.chrome.browser.profiles.Profile;
++import org.chromium.chrome.browser.profiles.ProfileManager;
 +import org.chromium.chrome.browser.suggestions.SuggestionsDependencyFactory;
 +import org.chromium.chrome.browser.suggestions.mostvisited.MostVisitedSites;
 +import org.chromium.url.GURL;
@@ -34,27 +23,26 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/bookmarks/TabBo
  /**
   * Helper class for managing the UI flow for bookmarking the active tab and kicking off the backend.
   * Shows a snackbar if a new bookmark was added. If the bookmark already exists, kicks off edit
-@@ -31,6 +36,7 @@ public class TabBookmarker {
-     private final Supplier<BottomSheetController> mBottomSheetControllerSupplier;
-     private final Supplier<SnackbarManager> mSnackbarManagerSupplier;
-     private final boolean mIsCustomTab;
+@@ -37,6 +43,7 @@ public class TabBookmarker {
+     private final BookmarkManagerOpener mBookmarkManagerOpener;
+     private final Supplier<PriceDropNotificationManager> mPriceDropNotificationManagerSupplier;
+     private final Supplier<Boolean> mBookmarkBarVisibilitySupplier;
 +    private MostVisitedSites mMostVisitedSites;
  
      /**
       * Constructor.
-@@ -97,6 +103,13 @@ public class TabBookmarker {
+@@ -123,6 +130,13 @@ public class TabBookmarker {
+             return;
+         }
  
-         // Defense in depth against the UI being erroneously enabled.
-         BookmarkModel bridge = mBookmarkModelSupplier.get();
-+	// remove blocklisted URL from most visited sites
-+	if (mMostVisitedSites == null) {
++	    // remove blocklisted URL from most visited sites
++	    if (mMostVisitedSites == null) {
 +            mMostVisitedSites =
-+                SuggestionsDependencyFactory.getInstance().createMostVisitedSites(Profile.getLastUsedRegularProfile());
++                SuggestionsDependencyFactory.getInstance().createMostVisitedSites(ProfileManager.getLastUsedRegularProfile());
 +        }
 +        mMostVisitedSites.removeBlocklistedUrl(tabToBookmark.getOriginalUrl());
 +
-         if (bridge == null || !bridge.isEditBookmarksEnabled()) {
-             assert false;
-             return;
+         // Defense in depth against the UI being erroneously enabled.
+         final BookmarkModel bookmarkModel = mBookmarkModelSupplier.get();
+         if (bookmarkModel == null || !bookmarkModel.isEditBookmarksEnabled()) {
 --
-2.25.1

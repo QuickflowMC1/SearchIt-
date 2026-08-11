@@ -9,24 +9,37 @@ See also:
 
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- chrome/browser/flag-metadata.json | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ .../browser/incognito/IncognitoSnapshotController.java      | 2 +-
+ chrome/browser/flag-metadata.json                           | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
+diff --git a/chrome/android/java/src/org/chromium/chrome/browser/incognito/IncognitoSnapshotController.java b/chrome/android/java/src/org/chromium/chrome/browser/incognito/IncognitoSnapshotController.java
+--- a/chrome/android/java/src/org/chromium/chrome/browser/incognito/IncognitoSnapshotController.java
++++ b/chrome/android/java/src/org/chromium/chrome/browser/incognito/IncognitoSnapshotController.java
+@@ -49,7 +49,7 @@ public abstract class IncognitoSnapshotController {
+         boolean expectedSecureState = mIsShowingIncognitoSupplier.get();
+         if (ChromeFeatureList.sIncognitoScreenshot.isEnabled()) {
+             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+-                mActivity.setRecentsScreenshotEnabled(!expectedSecureState);
++                mActivity.setRecentsScreenshotEnabled(true);
+             }
+             expectedSecureState = false;
+         }
 diff --git a/chrome/browser/flag-metadata.json b/chrome/browser/flag-metadata.json
 --- a/chrome/browser/flag-metadata.json
 +++ b/chrome/browser/flag-metadata.json
-@@ -4145,9 +4145,9 @@
-     "expiry_milestone": 110
+@@ -5608,10 +5608,10 @@
+     "expiry_milestone": -1
    },
    {
 -    "name": "incognito-screenshot",
--    "owners": [ "roagarwal", "sideyilmaz", "chrome-incognito@google.com" ],
--    "expiry_milestone": 110
-+    "name": "incognito-screenshot",                                          // Bromite: guard this feature flag
-+    "owners": [ "roagarwal", "sideyilmaz", "chrome-incognito@google.com" ],  // -
-+    "expiry_milestone": -1                                                   // -
+-    "owners": [ "zalmashni@google.com", "sideyilmaz@chromium.org", "chrome-incognito@google.com" ],
++    "name": "incognito-screenshot", // Bromite: guard this feature flag
++    "owners": [ "zalmashni@google.com", "sideyilmaz@chromium.org", "chrome-incognito@google.com" ],  // -
+     // This flag is used by testers and developers to screenshot incognito features.
+-    "expiry_milestone": -1
++    "expiry_milestone": -1          // -
    },
    {
-     "name": "info-card-acknowledgement-tracking",
+     "name": "incognito-theme-overlay-testing",
 --
-2.25.1

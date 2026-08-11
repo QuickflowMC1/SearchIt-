@@ -7,50 +7,26 @@ This approach is not comprehensive, see also:
 
 License: GPL-3.0-only - https://spdx.org/licenses/GPL-3.0-only.html
 ---
- .../execution_context/execution_context.cc    | 16 ++++++++++
  .../execution_context/execution_context.h     |  1 +
  .../renderer/core/loader/base_fetch_context.h |  1 +
  .../core/loader/frame_fetch_context.cc        | 20 ++++++++++++
  .../core/loader/frame_fetch_context.h         |  1 +
  .../core/loader/worker_fetch_context.cc       | 21 +++++++++++++
  .../core/loader/worker_fetch_context.h        |  1 +
+ .../core/workers/installed_scripts_manager.cc |  2 +-
  .../background_fetch_manager.cc               | 31 +++++++++++++++++++
  .../websockets/websocket_channel_impl.cc      |  5 +++
- .../modules/websockets/websocket_common.cc    | 29 +++++++++++++++++
+ .../modules/websockets/websocket_common.cc    | 30 ++++++++++++++++++
  .../modules/websockets/websocket_common.h     |  4 +++
- 11 files changed, 130 insertions(+)
+ 11 files changed, 116 insertions(+), 1 deletion(-)
 
-diff --git a/third_party/blink/renderer/core/execution_context/execution_context.cc b/third_party/blink/renderer/core/execution_context/execution_context.cc
---- a/third_party/blink/renderer/core/execution_context/execution_context.cc
-+++ b/third_party/blink/renderer/core/execution_context/execution_context.cc
-@@ -693,4 +693,20 @@ bool ExecutionContext::RequireTrustedTypes() const {
-   return require_safe_types_;
- }
- 
-+String ExecutionContext::addressSpaceForBindings() const {
-+  switch (AddressSpace()) {
-+    case network::mojom::IPAddressSpace::kPublic:
-+    case network::mojom::IPAddressSpace::kUnknown:
-+      return "public";
-+
-+    case network::mojom::IPAddressSpace::kPrivate:
-+      return "private";
-+
-+    case network::mojom::IPAddressSpace::kLocal:
-+      return "local";
-+  }
-+  NOTREACHED();
-+  return "public";
-+}
-+
- }  // namespace blink
 diff --git a/third_party/blink/renderer/core/execution_context/execution_context.h b/third_party/blink/renderer/core/execution_context/execution_context.h
 --- a/third_party/blink/renderer/core/execution_context/execution_context.h
 +++ b/third_party/blink/renderer/core/execution_context/execution_context.h
-@@ -396,6 +396,7 @@ class CORE_EXPORT ExecutionContext : public Supplementable<ExecutionContext>,
+@@ -388,6 +388,7 @@ class CORE_EXPORT ExecutionContext : public Supplementable<ExecutionContext>,
    void SetAddressSpace(network::mojom::blink::IPAddressSpace ip_address_space);
  
-   HeapObserverSet<ContextLifecycleObserver>& ContextLifecycleObserverSet();
+   HeapObserverList<ContextLifecycleObserver>& ContextLifecycleObserverSet();
 +  String addressSpaceForBindings() const;
    unsigned ContextLifecycleStateObserverCountForTesting() const;
  
@@ -58,7 +34,7 @@ diff --git a/third_party/blink/renderer/core/execution_context/execution_context
 diff --git a/third_party/blink/renderer/core/loader/base_fetch_context.h b/third_party/blink/renderer/core/loader/base_fetch_context.h
 --- a/third_party/blink/renderer/core/loader/base_fetch_context.h
 +++ b/third_party/blink/renderer/core/loader/base_fetch_context.h
-@@ -84,6 +84,7 @@ class CORE_EXPORT BaseFetchContext : public FetchContext {
+@@ -86,6 +86,7 @@ class CORE_EXPORT BaseFetchContext : public FetchContext {
  
    virtual SubresourceFilter* GetSubresourceFilter() const = 0;
    virtual bool ShouldBlockWebSocketByMixedContentCheck(const KURL&) const = 0;
@@ -69,7 +45,7 @@ diff --git a/third_party/blink/renderer/core/loader/base_fetch_context.h b/third
 diff --git a/third_party/blink/renderer/core/loader/frame_fetch_context.cc b/third_party/blink/renderer/core/loader/frame_fetch_context.cc
 --- a/third_party/blink/renderer/core/loader/frame_fetch_context.cc
 +++ b/third_party/blink/renderer/core/loader/frame_fetch_context.cc
-@@ -552,6 +552,26 @@ bool FrameFetchContext::ShouldBlockRequestByInspector(const KURL& url) const {
+@@ -1134,6 +1134,26 @@ bool FrameFetchContext::ShouldBlockRequestByInspector(const KURL& url) const {
    return should_block_request;
  }
  
@@ -82,7 +58,7 @@ diff --git a/third_party/blink/renderer/core/loader/frame_fetch_context.cc b/thi
 +  network::mojom::IPAddressSpace target_space =
 +      network::mojom::IPAddressSpace::kPublic;
 +  if (network_utils::IsReservedIPAddress(request_url.Host()))
-+    target_space = network::mojom::IPAddressSpace::kPrivate;
++    target_space = network::mojom::IPAddressSpace::kLocal;
 +  if (SecurityOrigin::Create(request_url)->IsLocalhost())
 +    target_space = network::mojom::IPAddressSpace::kLocal;
 +
@@ -99,7 +75,7 @@ diff --git a/third_party/blink/renderer/core/loader/frame_fetch_context.cc b/thi
 diff --git a/third_party/blink/renderer/core/loader/frame_fetch_context.h b/third_party/blink/renderer/core/loader/frame_fetch_context.h
 --- a/third_party/blink/renderer/core/loader/frame_fetch_context.h
 +++ b/third_party/blink/renderer/core/loader/frame_fetch_context.h
-@@ -168,6 +168,7 @@ class CORE_EXPORT FrameFetchContext final : public BaseFetchContext,
+@@ -197,6 +197,7 @@ class CORE_EXPORT FrameFetchContext final : public BaseFetchContext,
    bool ShouldBlockWebSocketByMixedContentCheck(const KURL&) const override;
    std::unique_ptr<WebSocketHandshakeThrottle> CreateWebSocketHandshakeThrottle()
        override;
@@ -111,14 +87,14 @@ diff --git a/third_party/blink/renderer/core/loader/worker_fetch_context.cc b/th
 --- a/third_party/blink/renderer/core/loader/worker_fetch_context.cc
 +++ b/third_party/blink/renderer/core/loader/worker_fetch_context.cc
 @@ -25,6 +25,7 @@
- #include "third_party/blink/renderer/platform/loader/fetch/resource_timing_info.h"
+ #include "third_party/blink/renderer/platform/loader/fetch/url_loader/url_loader_factory.h"
  #include "third_party/blink/renderer/platform/loader/fetch/worker_resource_timing_notifier.h"
  #include "third_party/blink/renderer/platform/network/network_state_notifier.h"
 +#include "third_party/blink/renderer/platform/network/network_utils.h"
  #include "third_party/blink/renderer/platform/runtime_enabled_features.h"
+ #include "third_party/blink/renderer/platform/scheduler/public/virtual_time_controller.h"
  #include "third_party/blink/renderer/platform/supplementable.h"
- #include "third_party/blink/renderer/platform/weborigin/security_policy.h"
-@@ -91,6 +92,26 @@ bool WorkerFetchContext::ShouldBlockRequestByInspector(const KURL& url) const {
+@@ -90,6 +91,26 @@ bool WorkerFetchContext::ShouldBlockRequestByInspector(const KURL& url) const {
    return should_block_request;
  }
  
@@ -131,7 +107,7 @@ diff --git a/third_party/blink/renderer/core/loader/worker_fetch_context.cc b/th
 +  network::mojom::IPAddressSpace target_space =
 +      network::mojom::IPAddressSpace::kPublic;
 +  if (network_utils::IsReservedIPAddress(request_url.Host()))
-+    target_space = network::mojom::IPAddressSpace::kPrivate;
++    target_space = network::mojom::IPAddressSpace::kLocal;
 +  if (SecurityOrigin::Create(request_url)->IsLocalhost())
 +    target_space = network::mojom::IPAddressSpace::kLocal;
 +
@@ -156,11 +132,23 @@ diff --git a/third_party/blink/renderer/core/loader/worker_fetch_context.h b/thi
    bool ShouldBlockFetchByMixedContentCheck(
        mojom::blink::RequestContextType request_context,
        network::mojom::blink::IPAddressSpace target_address_space,
+diff --git a/third_party/blink/renderer/core/workers/installed_scripts_manager.cc b/third_party/blink/renderer/core/workers/installed_scripts_manager.cc
+--- a/third_party/blink/renderer/core/workers/installed_scripts_manager.cc
++++ b/third_party/blink/renderer/core/workers/installed_scripts_manager.cc
+@@ -35,7 +35,7 @@ InstalledScriptsManager::ScriptData::ScriptData(
+   if (network_utils::IsReservedIPAddress(script_url_.Host()))
+     response_address_space_ = network::mojom::IPAddressSpace::kLocal;
+   if (SecurityOrigin::Create(script_url_)->IsLocalhost())
+-    response_address_space_ = network::mojom::IPAddressSpace::kLoopback;
++    response_address_space_ = network::mojom::IPAddressSpace::kLocal;
+ }
+ 
+ ContentSecurityPolicyResponseHeaders
 diff --git a/third_party/blink/renderer/modules/background_fetch/background_fetch_manager.cc b/third_party/blink/renderer/modules/background_fetch/background_fetch_manager.cc
 --- a/third_party/blink/renderer/modules/background_fetch/background_fetch_manager.cc
 +++ b/third_party/blink/renderer/modules/background_fetch/background_fetch_manager.cc
-@@ -102,6 +102,30 @@ bool ShouldBlockDanglingMarkup(const KURL& request_url) {
-          request_url.ProtocolIsInHTTPFamily();
+@@ -104,6 +104,30 @@ bool ShouldBlockDanglingMarkup(const KURL& request_url) {
+          request_url.ProtocolIsInHttpFamily();
  }
  
 +bool ShouldBlockGateWayAttacks(ExecutionContext* execution_context,
@@ -176,7 +164,7 @@ diff --git a/third_party/blink/renderer/modules/background_fetch/background_fetc
 +    network::mojom::IPAddressSpace target_space =
 +        network::mojom::IPAddressSpace::kPublic;
 +    if (network_utils::IsReservedIPAddress(request_url.Host()))
-+      target_space = network::mojom::IPAddressSpace::kPrivate;
++      target_space = network::mojom::IPAddressSpace::kLocal;
 +    if (SecurityOrigin::Create(request_url)->IsLocalhost())
 +      target_space = network::mojom::IPAddressSpace::kLocal;
 +
@@ -190,7 +178,7 @@ diff --git a/third_party/blink/renderer/modules/background_fetch/background_fetc
  scoped_refptr<BlobDataHandle> ExtractBlobHandle(
      Request* request,
      ExceptionState& exception_state) {
-@@ -221,6 +245,13 @@ ScriptPromise BackgroundFetchManager::fetch(
+@@ -191,6 +215,13 @@ ScriptPromise<BackgroundFetchRegistration> BackgroundFetchManager::fetch(
                                   exception_state);
      }
  
@@ -201,13 +189,13 @@ diff --git a/third_party/blink/renderer/modules/background_fetch/background_fetc
 +                                 exception_state);
 +    }
 +
-     kurls.insert(request_url);
-   }
- 
+     if (ShouldBlockPort(request_url)) {
+       return RejectWithTypeError(script_state, request_url,
+                                  "that port is not allowed", exception_state);
 diff --git a/third_party/blink/renderer/modules/websockets/websocket_channel_impl.cc b/third_party/blink/renderer/modules/websockets/websocket_channel_impl.cc
 --- a/third_party/blink/renderer/modules/websockets/websocket_channel_impl.cc
 +++ b/third_party/blink/renderer/modules/websockets/websocket_channel_impl.cc
-@@ -276,6 +276,11 @@ bool WebSocketChannelImpl::Connect(const KURL& url, const String& protocol) {
+@@ -288,6 +288,11 @@ bool WebSocketChannelImpl::Connect(const KURL& url, const String& protocol) {
      return false;
    }
  
@@ -217,12 +205,12 @@ diff --git a/third_party/blink/renderer/modules/websockets/websocket_channel_imp
 +  }
 +
    if (auto* scheduler = execution_context_->GetScheduler()) {
-     feature_handle_for_scheduler_ = scheduler->RegisterFeature(
-         SchedulingPolicy::Feature::kWebSocket,
+     if (!RuntimeEnabledFeatures::DisconnectWebSocketOnBFCacheEnabled()) {
+       // Two features are registered here:
 diff --git a/third_party/blink/renderer/modules/websockets/websocket_common.cc b/third_party/blink/renderer/modules/websockets/websocket_common.cc
 --- a/third_party/blink/renderer/modules/websockets/websocket_common.cc
 +++ b/third_party/blink/renderer/modules/websockets/websocket_common.cc
-@@ -125,9 +125,38 @@ WebSocketCommon::ConnectResult WebSocketCommon::Connect(
+@@ -139,9 +139,39 @@ WebSocketCommon::ConnectResult WebSocketCommon::Connect(
      return ConnectResult::kException;
    }
  
@@ -231,7 +219,8 @@ diff --git a/third_party/blink/renderer/modules/websockets/websocket_common.cc b
 +  if (ShouldBlockGateWayAttacks(requestor_space, url_)) {
 +    state_ = kClosed;
 +    exception_state.ThrowSecurityError(
-+        "Access to address of '" + url_.Host() + "' is not allowed from '" + execution_context->addressSpaceForBindings() + "' address space.");
++        "Access to address of '" + url_.Host() +
++        "' is not allowed from current address space.");
 +    return ConnectResult::kException;
 +  }
 +
@@ -247,7 +236,7 @@ diff --git a/third_party/blink/renderer/modules/websockets/websocket_common.cc b
 +  network::mojom::IPAddressSpace target_space =
 +      network::mojom::IPAddressSpace::kPublic;
 +  if (network_utils::IsReservedIPAddress(request_url.Host()))
-+    target_space = network::mojom::IPAddressSpace::kPrivate;
++    target_space = network::mojom::IPAddressSpace::kLocal;
 +  if (SecurityOrigin::Create(request_url)->IsLocalhost())
 +    target_space = network::mojom::IPAddressSpace::kLocal;
 +
@@ -258,22 +247,22 @@ diff --git a/third_party/blink/renderer/modules/websockets/websocket_common.cc b
 +  return false;
 +}
 +
- void WebSocketCommon::CloseInternal(int code,
+ void WebSocketCommon::CloseInternal(std::optional<uint16_t> code,
                                      const String& reason,
                                      WebSocketChannel* channel,
 diff --git a/third_party/blink/renderer/modules/websockets/websocket_common.h b/third_party/blink/renderer/modules/websockets/websocket_common.h
 --- a/third_party/blink/renderer/modules/websockets/websocket_common.h
 +++ b/third_party/blink/renderer/modules/websockets/websocket_common.h
-@@ -7,6 +7,8 @@
- #ifndef THIRD_PARTY_BLINK_RENDERER_MODULES_WEBSOCKETS_WEBSOCKET_COMMON_H_
- #define THIRD_PARTY_BLINK_RENDERER_MODULES_WEBSOCKETS_WEBSOCKET_COMMON_H_
+@@ -11,6 +11,8 @@
+ 
+ #include <optional>
  
 +#include "services/network/public/mojom/ip_address_space.mojom.h"
 +#include "third_party/blink/renderer/platform/network/network_utils.h"
  #include "third_party/blink/renderer/modules/modules_export.h"
  #include "third_party/blink/renderer/platform/weborigin/kurl.h"
  #include "third_party/blink/renderer/platform/wtf/allocator/allocator.h"
-@@ -54,6 +56,8 @@ class MODULES_EXPORT WebSocketCommon {
+@@ -58,6 +60,8 @@ class MODULES_EXPORT WebSocketCommon {
    void SetState(State state) { state_ = state; }
    const KURL& Url() const { return url_; }
  
@@ -283,4 +272,3 @@ diff --git a/third_party/blink/renderer/modules/websockets/websocket_common.h b/
  
    // Returns true if |protocol| is a valid WebSocket subprotocol name.
 --
-2.25.1
