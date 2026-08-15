@@ -3,7 +3,7 @@
 ## SUMMARY
 This document describes the features in SearchIt! that communicate with third-party services: some of these settings are active by default but can be easy deactivated via the user interface.
 -	Automatic browser update check (disabled by default)
-<br>SearchIt! check address “https://github.com/QuickshotMC1/SearchIt-/releases/download” once a day
+<br>SearchIt! check address “https://github.com/QuickflowMC1/SearchIt-/releases/download” once a day
 
 -	Download of selected adblock subscription (enabled by default)
 <br>SearchIt! check user-selected urls in the adblock section once a day. 
