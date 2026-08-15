@@ -44,12 +44,17 @@ on:
 
 env:
   SearchIt_SHA: ${{ github.event.inputs.sha || github.sha }}
+  RUNNER: ${{ github.event.inputs.type || 'ci' }}
+  TARGET_OS: ${{ github.event.inputs.target_os || 'all' }}
+  BUILD_TARGET: ${{ github.event.inputs.build || 'all' }}
+  DEBUG: ${{ github.event.inputs.debug || 'false' }}
+  CLANGD: ${{ github.event.inputs.clangd || 'false' }}
   REMOVEDOCKERSUPPORT: true
   USELOCALIMAGE: true
 
 jobs:
   check_images:
-    runs-on: ${{ github.event.inputs.type }}
+    runs-on: ${{ env.RUNNER }}
     steps:
       - name: Checkout repo
         uses: actions/checkout@v2
@@ -168,7 +173,7 @@ jobs:
           docker tag uazo/cromite-build:$VERSION-$SearchIt_SHA uazo/cromite-build:build
 
   build:
-    runs-on: ${{ github.event.inputs.type }}
+    runs-on: ${{ env.RUNNER }}
     needs: check_images
     if: success()
     timeout-minutes: 1440
@@ -190,18 +195,18 @@ jobs:
         WINDOWSSDKDIR: "/win_sdk/sdks/Win11SDK_10.0.26100.0/Windows Kits/10/"
         GYP_MSVS_OVERRIDE_PATH: /win_sdk/sdks/Win11SDK_10.0.26100.0/
         # compile in debug mode
-        TARGET_ISDEBUG: ${{ github.event.inputs.debug }}
-        TARGET_OS: ${{ github.event.inputs.target_os }}
+        TARGET_ISDEBUG: ${{ env.DEBUG }}
+        TARGET_OS: ${{ env.TARGET_OS }}
         USE_KEYSTORE: true
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         SearchIt_PREF_HASH_SEED_BIN: ${{ secrets.SearchIt_PREF_HASH_SEED_BIN }}
       volumes:
-        - /storage/images/${{ github.event.inputs.sha }}/android/${{ github.event.inputs.debug }}/arm:/home/lg/working_dir/chromium/src/out/arm
-        - /storage/images/${{ github.event.inputs.sha }}/android/${{ github.event.inputs.debug }}/arm64:/home/lg/working_dir/chromium/src/out/arm64
-        - /storage/images/${{ github.event.inputs.sha }}/android/${{ github.event.inputs.debug }}/x64:/home/lg/working_dir/chromium/src/out/x64
-        - /storage/images/${{ github.event.inputs.sha }}/linux/${{ github.event.inputs.debug }}/lin64:/home/lg/working_dir/chromium/src/out/lin64
-        - /storage/images/${{ github.event.inputs.sha }}/win/x64:/home/lg/working_dir/chromium/src/out/win64
-        - /storage/images/${{ github.event.inputs.sha }}/android/${{ github.event.inputs.debug }}/arm64_webview:/home/lg/working_dir/chromium/src/out/arm64_webview
+        - /storage/images/${{ env.SearchIt_SHA }}/android/${{ env.DEBUG }}/arm:/home/lg/working_dir/chromium/src/out/arm
+        - /storage/images/${{ env.SearchIt_SHA }}/android/${{ env.DEBUG }}/arm64:/home/lg/working_dir/chromium/src/out/arm64
+        - /storage/images/${{ env.SearchIt_SHA }}/android/${{ env.DEBUG }}/x64:/home/lg/working_dir/chromium/src/out/x64
+        - /storage/images/${{ env.SearchIt_SHA }}/linux/${{ env.DEBUG }}/lin64:/home/lg/working_dir/chromium/src/out/lin64
+        - /storage/images/${{ env.SearchIt_SHA }}/win/x64:/home/lg/working_dir/chromium/src/out/win64
+        - /storage/images/${{ env.SearchIt_SHA }}/android/${{ env.DEBUG }}/arm64_webview:/home/lg/working_dir/chromium/src/out/arm64_webview
         - /tmp/proxy:/tmp/proxy
         - /win_sdk:/win_sdk
 
@@ -267,7 +272,7 @@ jobs:
           echo ../../../../../usr/bin >$WORKSPACE/depot_tools/python3_bin_reldir.txt
 
       - name: Build SearchIt! Android x64
-        if: ${{ (github.event.inputs.target_os == 'android' || github.event.inputs.target_os == 'all') && (github.event.inputs.build == 'x64' || github.event.inputs.build == 'all') }}
+        if: ${{ (env.TARGET_OS == 'android' || env.TARGET_OS == 'all') && (env.BUILD_TARGET == 'x64' || env.BUILD_TARGET == 'all') }}
         shell: bash
         run: |
           PATH=$WORKSPACE/chromium/src/third_party/llvm-build/Release+Asserts/bin:$WORKSPACE/depot_tools/:/usr/local/go/bin:$WORKSPACE/mtool/bin:$PATH
@@ -288,7 +293,7 @@ jobs:
           cp ../../SearchIt!/build/RELEASE out/x64
 
       - name: Get ninja logs Android x64
-        if: ${{ (github.event.inputs.target_os == 'android' || github.event.inputs.target_os == 'all') && (github.event.inputs.build == 'x64' || github.event.inputs.build == 'all') }}
+        if: ${{ (env.TARGET_OS == 'android' || env.TARGET_OS == 'all') && (env.BUILD_TARGET == 'x64' || env.BUILD_TARGET == 'all') }}
         shell: bash
         run: |
           cd $WORKSPACE
@@ -296,7 +301,7 @@ jobs:
           python3 $WORKSPACE/chromium/src/third_party/catapult/tracing/bin/trace2html $WORKSPACE/chromium/src/out/x64/ninja_log_trace.json
 
       - name: Build SearchIt! Windows x64
-        if: ${{ github.event.inputs.target_os == 'win' || github.event.inputs.target_os == 'all' }}
+        if: ${{ env.TARGET_OS == 'win' || env.TARGET_OS == 'all' }}
         shell: bash
         run: |
           PATH=$WORKSPACE/chromium/src/third_party/llvm-build/Release+Asserts/bin:$WORKSPACE/depot_tools/:/usr/local/go/bin:$WORKSPACE/mtool/bin:$PATH
@@ -316,7 +321,7 @@ jobs:
           cp ../../SearchIt!/build/RELEASE out/win64
 
       - name: Get ninja logs Windows x64
-        if: ${{ github.event.inputs.target_os == 'win' || github.event.inputs.target_os == 'all' }}
+        if: ${{ env.TARGET_OS == 'win' || env.TARGET_OS == 'all' }}
         shell: bash
         run: |
           cd $WORKSPACE
@@ -324,7 +329,7 @@ jobs:
           python3 $WORKSPACE/chromium/src/third_party/catapult/tracing/bin/trace2html $WORKSPACE/chromium/src/out/win64/ninja_log_trace.json
 
       - name: Build SearchIt! Android arm64
-        if: ${{ (github.event.inputs.target_os == 'android' || github.event.inputs.target_os == 'all') && (github.event.inputs.build == 'arm64' || github.event.inputs.build == 'all') }}
+        if: ${{ (env.TARGET_OS == 'android' || env.TARGET_OS == 'all') && (env.BUILD_TARGET == 'arm64' || env.BUILD_TARGET == 'all') }}
         shell: bash
         run: |
           PATH=$WORKSPACE/chromium/src/third_party/llvm-build/Release+Asserts/bin:$WORKSPACE/depot_tools/:/usr/local/go/bin:$WORKSPACE/mtool/bin:$PATH
@@ -345,7 +350,7 @@ jobs:
           cp ../../SearchIt!/build/RELEASE out/arm64
 
       - name: Get ninja logs Android arm64
-        if: ${{ (github.event.inputs.target_os == 'android' || github.event.inputs.target_os == 'all') && (github.event.inputs.build == 'arm64' || github.event.inputs.build == 'all') }}
+        if: ${{ (env.TARGET_OS == 'android' || env.TARGET_OS == 'all') && (env.BUILD_TARGET == 'arm64' || env.BUILD_TARGET == 'all') }}
         shell: bash
         run: |
           cd $WORKSPACE
@@ -353,7 +358,7 @@ jobs:
           python3 $WORKSPACE/chromium/src/third_party/catapult/tracing/bin/trace2html $WORKSPACE/chromium/src/out/arm64/ninja_log_trace.json
 
       - name: Generate breakpad symbols for Android arm64
-        if: ${{ (github.event.inputs.target_os == 'android' || github.event.inputs.target_os == 'all') && (github.event.inputs.build == 'arm64' || github.event.inputs.build == 'all') }}
+        if: ${{ (env.TARGET_OS == 'android' || env.TARGET_OS == 'all') && (env.BUILD_TARGET == 'arm64' || env.BUILD_TARGET == 'all') }}
         shell: bash
         run: |
           PATH=$WORKSPACE/chromium/src/third_party/llvm-build/Release+Asserts/bin:$WORKSPACE/depot_tools/:/usr/local/go/bin:$WORKSPACE/mtool/bin:$PATH
@@ -370,7 +375,7 @@ jobs:
           echo "::endgroup::"
 
       - name: Generate Supersize data for Android arm64
-        if: ${{ github.event.inputs.debug == 'false' && (github.event.inputs.target_os == 'android' || github.event.inputs.target_os == 'all') && (github.event.inputs.build == 'arm64' || github.event.inputs.build == 'all') }}
+        if: ${{ env.DEBUG == 'false' && (env.TARGET_OS == 'android' || env.TARGET_OS == 'all') && (env.BUILD_TARGET == 'arm64' || env.BUILD_TARGET == 'all') }}
         shell: bash
         run: |
           PATH=$WORKSPACE/chromium/src/third_party/llvm-build/Release+Asserts/bin:$WORKSPACE/depot_tools/:/usr/local/go/bin:$WORKSPACE/mtool/bin:$PATH
@@ -379,7 +384,7 @@ jobs:
           vpython3 tools/binary_size/libsupersize/main.py archive out/arm64/chrome.size --apk-file out/arm64/apks/ChromePublic.apk -v
 
       - name: Build SearchIt! Android arm
-        if: ${{ (github.event.inputs.target_os == 'android' || github.event.inputs.target_os == 'all') && (github.event.inputs.build == 'arm' || github.event.inputs.build == 'all') }}
+        if: ${{ (env.TARGET_OS == 'android' || env.TARGET_OS == 'all') && (env.BUILD_TARGET == 'arm' || env.BUILD_TARGET == 'all') }}
         shell: bash
         run: |
           PATH=$WORKSPACE/chromium/src/third_party/llvm-build/Release+Asserts/bin:$WORKSPACE/depot_tools/:/usr/local/go/bin:$WORKSPACE/mtool/bin:$PATH
@@ -400,7 +405,7 @@ jobs:
           cp ../../SearchIt!/build/RELEASE out/arm
 
       - name: Get ninja logs Android arm
-        if: ${{ (github.event.inputs.target_os == 'android' || github.event.inputs.target_os == 'all') && (github.event.inputs.build == 'arm' || github.event.inputs.build == 'all') }}
+        if: ${{ (env.TARGET_OS == 'android' || env.TARGET_OS == 'all') && (env.BUILD_TARGET == 'arm' || env.BUILD_TARGET == 'all') }}
         shell: bash
         run: |
           cd $WORKSPACE
@@ -408,7 +413,7 @@ jobs:
           python3 $WORKSPACE/chromium/src/third_party/catapult/tracing/bin/trace2html $WORKSPACE/chromium/src/out/arm/ninja_log_trace.json
 
       - name: Build SearchIt! Linux 64
-        if: ${{ (github.event.inputs.target_os == 'linux' || github.event.inputs.target_os == 'all') }}
+        if: ${{ (env.TARGET_OS == 'linux' || env.TARGET_OS == 'all') }}
         shell: bash
         run: |
           PATH=$WORKSPACE/chromium/src/third_party/llvm-build/Release+Asserts/bin:$WORKSPACE/depot_tools/:/usr/local/go/bin:$WORKSPACE/mtool/bin:$PATH
@@ -428,7 +433,7 @@ jobs:
           cp ../../SearchIt!/build/RELEASE out/lin64
 
       - name: Get ninja logs Linux 64
-        if: ${{ (github.event.inputs.target_os == 'linux' || github.event.inputs.target_os == 'all') }}
+        if: ${{ (env.TARGET_OS == 'linux' || env.TARGET_OS == 'all') }}
         shell: bash
         run: |
           cd $WORKSPACE
@@ -454,7 +459,7 @@ jobs:
           cp ../../SearchIt!/build/RELEASE out/arm64_webview
 
       - name: Generate clangd index for Android arm64
-        if: ${{ github.event.inputs.clangd == 'true' }}
+        if: ${{ env.CLANGD == 'true' }}
         shell: bash
         run: |
           PATH=$WORKSPACE/chromium/src/third_party/llvm-build/Release+Asserts/bin:$WORKSPACE/depot_tools/:/usr/local/go/bin:$WORKSPACE/mtool/bin:$PATH
