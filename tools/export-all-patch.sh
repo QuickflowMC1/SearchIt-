@@ -29,7 +29,7 @@ for patch in $ALLPATCHS_E; do
 
 done
 
-PATCH_LIST=~/SearchIt!/build/SearchIt!_patches_list.txt
+PATCH_LIST=~/SearchIt!/build/SearchIt_patches_list.txt
 mkdir ~/SearchIt!/build/patches-new/changed
 mkdir ~/SearchIt!/build/patches-new/contrib
 for current_file in $(cat $PATCH_LIST); do

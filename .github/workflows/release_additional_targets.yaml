@@ -15,7 +15,7 @@ on:
         default: 'ci'
         
 env:
-  SearchIt!_SHA: ${{ github.event.inputs.sha }}
+  SearchIt_SHA: ${{ github.event.inputs.sha }}
   REMOVEDOCKERSUPPORT: true
   USELOCALIMAGE: true
 
@@ -34,7 +34,7 @@ jobs:
         run: |
           wget https://github.com/ericchiang/pup/releases/download/v0.4.0/pup_v0.4.0_linux_amd64.zip
           unzip pup_v0.4.0_linux_amd64.zip && rm pup_v0.4.0_linux_amd64.zip
-          BRANCH=$(curl https://github.com/uazo/SearchIt!/branch_commits/$SearchIt!_SHA | ./pup -p li.branch:last-child a text{} | xargs)
+          BRANCH=$(curl https://github.com/uazo/SearchIt!/branch_commits/$SearchIt_SHA | ./pup -p li.branch:last-child a text{} | xargs)
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
       - name: Checkout 'uazo/SearchIt!'
@@ -66,8 +66,8 @@ jobs:
           sudo chown runner x64_SystemWebViewShell.apk
 
           echo Uploading x64_SystemWebView
-          $GH release upload $VERSION-$SearchIt!_SHA x64_SystemWebView.apk
-          $GH release upload $VERSION-$SearchIt!_SHA x64_SystemWebViewShell.apk
+          $GH release upload $VERSION-$SearchIt_SHA x64_SystemWebView.apk
+          $GH release upload $VERSION-$SearchIt_SHA x64_SystemWebViewShell.apk
           echo "::endgroup::"
 
           # vanilla chromium arm
@@ -76,7 +76,7 @@ jobs:
           sudo chown runner arm_VanillaChromium.apk
 
           echo Uploading arm_VanillaChromium
-          $GH release upload $VERSION-$SearchIt!_SHA arm_VanillaChromium.apk
+          $GH release upload $VERSION-$SearchIt_SHA arm_VanillaChromium.apk
           echo "::endgroup::"
 
           # vanilla chromium arm64
@@ -85,7 +85,7 @@ jobs:
           sudo chown runner arm64_VanillaChromium.apk
 
           echo Uploading arm64_VanillaChromium
-          $GH release upload $VERSION-$SearchIt!_SHA arm64_VanillaChromium.apk
+          $GH release upload $VERSION-$SearchIt_SHA arm64_VanillaChromium.apk
           echo "::endgroup::"
 
           # vanilla chromium x64
@@ -94,5 +94,5 @@ jobs:
           sudo chown runner x64_VanillaChromium.apk
 
           echo Uploading x64_VanillaChromium
-          $GH release upload $VERSION-$SearchIt!_SHA x64_VanillaChromium.apk
+          $GH release upload $VERSION-$SearchIt_SHA x64_VanillaChromium.apk
           echo "::endgroup::"

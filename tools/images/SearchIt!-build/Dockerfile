@@ -1,7 +1,7 @@
-﻿ARG SearchIt!_SHA
+﻿ARG SearchIt_SHA
 ARG VERSION
 
-FROM uazo/SearchIt!:$VERSION-$SearchIt!_SHA
+FROM uazo/SearchIt!:$VERSION-$SearchIt_SHA
 
 ARG HTTP_PROXY
 ENV HTTP_PROXY=$HTTP_PROXY

@@ -59,11 +59,11 @@ git commit -m ":NOEXPORT: third_party/boringssl repo" >/dev/null
 git prune
 
 echo -e ${RED} ------- patches ${NC}
-cat ../../SearchIt!/build/SearchIt!_patches_list.txt
+cat ../../SearchIt!/build/SearchIt_patches_list.txt
 echo
 
 echo -e ${RED} ------- apply patches ${NC}
-for file in $(cat ../../SearchIt!/build/SearchIt!_patches_list.txt) ; do
+for file in $(cat ../../SearchIt!/build/SearchIt_patches_list.txt) ; do
 
    if [[ "$file" == *".patch" ]]; then
 	#if [[ "$file" == *"Automated-domain-substitution"* ]]; then

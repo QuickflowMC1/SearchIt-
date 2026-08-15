@@ -2,8 +2,8 @@
 
 FROM uazo/chromium:$VERSION
 
-ARG SearchIt!_SHA
-ENV SearchIt!_SHA=$SearchIt!_SHA
+ARG SearchIt_SHA
+ENV SearchIt_SHA=$SearchIt_SHA
 
 ARG HTTP_PROXY
 ENV HTTP_PROXY=$HTTP_PROXY
@@ -24,7 +24,7 @@ RUN sudo chmod +x ./apply-SearchIt!-patches.sh && \
     cd SearchIt! && \
     git init && \
     git remote add origin https://github.com/uazo/SearchIt! && \
-    git fetch origin $SearchIt!_SHA && \
+    git fetch origin $SearchIt_SHA && \
     git reset --hard FETCH_HEAD && \
     cd ..
 

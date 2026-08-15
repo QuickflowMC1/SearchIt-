@@ -40,7 +40,7 @@ on:
         default: 'false'
 
 env:
-  SearchIt!_SHA: ${{ github.event.inputs.sha }}
+  SearchIt_SHA: ${{ github.event.inputs.sha }}
   REMOVEDOCKERSUPPORT: true
   USELOCALIMAGE: true
 
@@ -114,32 +114,32 @@ jobs:
             fi
           fi
 
-      - name: Building SearchIt! container ${{ env.VERSION }}-${{ env.SearchIt!_SHA }}
+      - name: Building SearchIt! container ${{ env.VERSION }}-${{ env.SearchIt_SHA }}
         shell: bash
         run: |
-          docker pull uazo/SearchIt!:$VERSION-$SearchIt!_SHA || true
-          IS_PRESENT=$(docker inspect --type=image uazo/SearchIt!:$VERSION-$SearchIt!_SHA > /dev/null ; echo $?)
+          docker pull uazo/SearchIt!:$VERSION-$SearchIt_SHA || true
+          IS_PRESENT=$(docker inspect --type=image uazo/SearchIt!:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
           if [ $IS_PRESENT -ne "0" ]; then
-            IS_PRESENT=$(./regctl image inspect uazo/SearchIt!:$VERSION-$SearchIt!_SHA > /dev/null ; echo $?)
+            IS_PRESENT=$(./regctl image inspect uazo/SearchIt!:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
             if [ $IS_PRESENT -ne "0" ]; then
-              DOCKER_BUILDKIT=1 docker build -t uazo/SearchIt!:$VERSION-$SearchIt!_SHA --progress plain \
-                --build-arg SearchIt!_SHA=$SearchIt!_SHA \
+              DOCKER_BUILDKIT=1 docker build -t uazo/SearchIt!:$VERSION-$SearchIt_SHA --progress plain \
+                --build-arg SearchIt_SHA=$SearchIt_SHA \
                 --build-arg VERSION=$VERSION \
                 --build-arg HTTP_PROXY="$PROXY_ADDR" \
                 SearchIt!/tools/images/SearchIt!-source/.
             fi
           fi
 
-      - name: Building SearchIt!-build container ${{ env.VERSION }}-${{ env.SearchIt!_SHA }}
+      - name: Building SearchIt!-build container ${{ env.VERSION }}-${{ env.SearchIt_SHA }}
         shell: bash
         run: |
-          docker pull uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA || true
-          IS_PRESENT=$(docker inspect --type=image uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA > /dev/null ; echo $?)
+          docker pull uazo/SearchIt!-build:$VERSION-$SearchIt_SHA || true
+          IS_PRESENT=$(docker inspect --type=image uazo/SearchIt!-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
           if [ $IS_PRESENT -ne "0" ]; then
-            IS_PRESENT=$(./regctl image inspect uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA > /dev/null ; echo $?)
+            IS_PRESENT=$(./regctl image inspect uazo/SearchIt!-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
             if [ $IS_PRESENT -ne "0" ]; then
-              DOCKER_BUILDKIT=1 docker build -t uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA --progress plain \
-                --build-arg SearchIt!_SHA=$SearchIt!_SHA \
+              DOCKER_BUILDKIT=1 docker build -t uazo/SearchIt!-build:$VERSION-$SearchIt_SHA --progress plain \
+                --build-arg SearchIt_SHA=$SearchIt_SHA \
                 --build-arg VERSION=$VERSION \
                 --build-arg HTTP_PROXY="$PROXY_ADDR" \
                 --no-cache \
@@ -150,9 +150,9 @@ jobs:
       - name: Get uazo/SearchIt!-build from docker hub if present
         shell: bash
         run: |
-          IS_PRESENT=$(./regctl image inspect uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA > /dev/null ; echo $?)
+          IS_PRESENT=$(./regctl image inspect uazo/SearchIt!-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
           if [ $IS_PRESENT -eq "0" ]; then
-            docker pull uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA
+            docker pull uazo/SearchIt!-build:$VERSION-$SearchIt_SHA
           fi
 
       - name: Mark image to build
@@ -162,7 +162,7 @@ jobs:
           if [ $IS_PRESENT -eq "0" ]; then
             docker rmi uazo/SearchIt!-build:build
           fi
-          docker tag uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA uazo/SearchIt!-build:build
+          docker tag uazo/SearchIt!-build:$VERSION-$SearchIt_SHA uazo/SearchIt!-build:build
 
   build:
     runs-on: ${{ github.event.inputs.type }}
@@ -191,7 +191,7 @@ jobs:
         TARGET_OS: ${{ github.event.inputs.target_os }}
         USE_KEYSTORE: true
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        SearchIt!_PREF_HASH_SEED_BIN: ${{ secrets.SearchIt!_PREF_HASH_SEED_BIN }}
+        SearchIt_PREF_HASH_SEED_BIN: ${{ secrets.SearchIt_PREF_HASH_SEED_BIN }}
       volumes:
         - /storage/images/${{ github.event.inputs.sha }}/android/${{ github.event.inputs.debug }}/arm:/home/lg/working_dir/chromium/src/out/arm
         - /storage/images/${{ github.event.inputs.sha }}/android/${{ github.event.inputs.debug }}/arm64:/home/lg/working_dir/chromium/src/out/arm64

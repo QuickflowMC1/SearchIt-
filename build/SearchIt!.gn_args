@@ -110,7 +110,7 @@ if (target_os == "android") {
     android_keystore_password = getenv("KEYSTORE_PASSWORD")
   }
 
-  SearchIt!_pref_hash_seed_bin = getenv("SearchIt!_PREF_HASH_SEED_BIN")
+  SearchIt_pref_hash_seed_bin = getenv("SearchIt_PREF_HASH_SEED_BIN")
 
   disable_android_lint = true
 

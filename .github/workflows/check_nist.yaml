@@ -56,7 +56,7 @@ jobs:
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c #v6.1.0
         if: env.CHANGES == '1'
         with:
-          token: ${{ secrets.SearchIt!_PULLS }}
+          token: ${{ secrets.SearchIt_PULLS }}
           path: SearchIt!
           base: ${{ env.BRANCH }}
           #push-to-fork: uazo/SearchIt!

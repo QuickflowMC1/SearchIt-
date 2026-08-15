@@ -5,8 +5,8 @@ git am --abort
 PATCH_OLD_PATH=~/SearchIt!/build/patches
 PATCH_NEW_PATH=~/SearchIt!/build/patches-new
 
-DESTINATION=~/SearchIt!/build/SearchIt!_patches_list_ok.txt
-DESTINATION_FAILED=~/SearchIt!/build/SearchIt!_patches_list_failed.txt
+DESTINATION=~/SearchIt!/build/SearchIt_patches_list_ok.txt
+DESTINATION_FAILED=~/SearchIt!/build/SearchIt_patches_list_failed.txt
 
 rm $DESTINATION
 rm $DESTINATION_FAILED
@@ -14,9 +14,9 @@ mkdir $PATCH_NEW_PATH
 
 IFS=$'\n'
 
-PATCH_LIST=~/SearchIt!/build/SearchIt!_patches_list_new.txt
+PATCH_LIST=~/SearchIt!/build/SearchIt_patches_list_new.txt
 if [ ! -f $PATCH_LIST ]; then
-        cp ~/SearchIt!/build/SearchIt!_patches_list.txt $PATCH_LIST
+        cp ~/SearchIt!/build/SearchIt_patches_list.txt $PATCH_LIST
 fi
 
 echo "Phase 1: check clean"

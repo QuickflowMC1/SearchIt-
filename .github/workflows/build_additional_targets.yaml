@@ -28,7 +28,7 @@ on:
         default: 'false'
 
 env:
-  SearchIt!_SHA: ${{ github.event.inputs.sha }}
+  SearchIt_SHA: ${{ github.event.inputs.sha }}
   REMOVEDOCKERSUPPORT: true
   USELOCALIMAGE: true
 
@@ -66,9 +66,9 @@ jobs:
       - name: Get uazo/SearchIt!-build from docker hub if present
         shell: bash
         run: |
-          IS_PRESENT=$(docker manifest inspect uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA > /dev/null ; echo $?)
+          IS_PRESENT=$(docker manifest inspect uazo/SearchIt!-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
           if [ $IS_PRESENT -eq "0" ]; then
-            docker pull uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA
+            docker pull uazo/SearchIt!-build:$VERSION-$SearchIt_SHA
           fi
 
       - name: Mark image to build
@@ -78,7 +78,7 @@ jobs:
           if [ $IS_PRESENT -eq "0" ]; then
             docker rmi uazo/SearchIt!-build:build
           fi
-          docker tag uazo/SearchIt!-build:$VERSION-$SearchIt!_SHA uazo/SearchIt!-build:build
+          docker tag uazo/SearchIt!-build:$VERSION-$SearchIt_SHA uazo/SearchIt!-build:build
 
   build:
     runs-on: ${{ github.event.inputs.type }}
@@ -105,7 +105,7 @@ jobs:
         TARGET_ISDEBUG: ${{ github.event.inputs.debug }}
         USE_KEYSTORE: true
         KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        SearchIt!_PREF_HASH_SEED_BIN: ${{ secrets.SearchIt!_PREF_HASH_SEED_BIN }}
+        SearchIt_PREF_HASH_SEED_BIN: ${{ secrets.SearchIt_PREF_HASH_SEED_BIN }}
       volumes:
         - /storage/images/${{ github.event.inputs.sha }}/android/${{ github.event.inputs.debug }}/chr_arm:/home/lg/working_dir/chromium/src/out/chr_arm
         - /storage/images/${{ github.event.inputs.sha }}/android/${{ github.event.inputs.debug }}/chr_arm64:/home/lg/working_dir/chromium/src/out/chr_arm64
