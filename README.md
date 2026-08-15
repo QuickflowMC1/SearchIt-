@@ -1,14 +1,14 @@
-﻿<a href="https://github.com/uazo/SearchIt!/releases/latest">
-  <img src="https://img.shields.io/github/v/release/uazo/SearchIt!" alt="current SearchIt! release" title="current SearchIt! release" />
+﻿<a href="https://github.com/QuickshotMC1/SearchIt-/releases/latest">
+  <img src="https://img.shields.io/github/v/release/QuickshotMC1/SearchIt-" alt="current SearchIt! release" title="current SearchIt! release" />
 </a>
 <br>
 
-[![Build SearchIt!](https://github.com/uazo/SearchIt!/actions/workflows/build_SearchIt!.yaml/badge.svg)](https://github.com/uazo/SearchIt!/actions/workflows/build_SearchIt!.yaml)
+[![Build SearchIt!](https://github.com/QuickshotMC1/SearchIt-/actions/workflows/build_SearchIt!.yaml/badge.svg)](https://github.com/QuickshotMC1/SearchIt-/actions/workflows/build_SearchIt!.yaml)
 
 # SearchIt! (a Bromite fork) - Take back your browser
 
-<a href="https://www.SearchIt!.org">
-  <img title="SearchIt! - take back your browser!" src="https://www.SearchIt!.org/app_icon.png" width="96" alt="Bromite" />
+<a href="https://www.cromite.org">
+  <img title="SearchIt! - take back your browser!" src="https://www.cromite.org/app_icon.png" width="96" alt="Bromite" />
 </a>
 <br>
 
@@ -31,30 +31,30 @@ SearchIt!'s privacy features, including anti-fingerprinting mitigations (which a
 Please note that this project is not free of bugs and that changing the behaviour of a browser can be risky and not without problems.
 
 # Docs
-- [Privacy Policy](https://github.com/uazo/SearchIt!/blob/master/docs/PRIVACY_POLICY.md)
-- [Features](https://github.com/uazo/SearchIt!/blob/master/docs/FEATURES.md)
-- [Faqs](https://github.com/uazo/SearchIt!/blob/master/docs/FAQ.md)
-- [How to build](https://github.com/uazo/SearchIt!/blob/master/docs/HOW_TO_BUILD.md)
-- [Patch list](https://github.com/uazo/SearchIt!/blob/master/docs/PATCHES.md)
+- [Privacy Policy](https://github.com/QuickshotMC1/SearchIt-/blob/master/docs/PRIVACY_POLICY.md)
+- [Features](https://github.com/QuickshotMC1/SearchIt-/blob/master/docs/FEATURES.md)
+- [Faqs](https://github.com/QuickshotMC1/SearchIt-/blob/master/docs/FAQ.md)
+- [How to build](https://github.com/QuickshotMC1/SearchIt-/blob/master/docs/HOW_TO_BUILD.md)
+- [Patch list](https://github.com/QuickshotMC1/SearchIt-/blob/master/docs/PATCHES.md)
 
 # Releases
 
-All built versions are available as [releases](https://github.com/uazo/SearchIt!/releases).
+All built versions are available as [releases](https://github.com/QuickshotMC1/SearchIt-/releases).
 
 SearchIt! is currently built for ARM, ARM64, Android x86, Windows x64 and Linux.
 
 The following files will be present for each release:
 
 #### SearchIt! apk for android:
-- [arm64_ChromePublic.apk](https://github.com/uazo/SearchIt!/releases/latest/download/arm64_ChromePublic.apk)
-- [arm_ChromePublic.apk](https://github.com/uazo/SearchIt!/releases/latest/download/arm_ChromePublic.apk)
-- [x64_ChromePublic.apk](https://github.com/uazo/SearchIt!/releases/latest/download/x64_ChromePublic.apk)
+- [arm64_ChromePublic.apk](https://github.com/QuickshotMC1/SearchIt-/releases/latest/download/arm64_ChromePublic.apk)
+- [arm_ChromePublic.apk](https://github.com/QuickshotMC1/SearchIt-/releases/latest/download/arm_ChromePublic.apk)
+- [x64_ChromePublic.apk](https://github.com/QuickshotMC1/SearchIt-/releases/latest/download/x64_ChromePublic.apk)
 
 #### Linux package:
-- [chrome-lin64.tar.gz](https://github.com/uazo/SearchIt!/releases/latest/download/chrome-lin64.tar.gz)
+- [chrome-lin64.tar.gz](https://github.com/QuickshotMC1/SearchIt-/releases/latest/download/chrome-lin64.tar.gz)
 
 #### Windows package:
-- [chrome-win.zip](https://github.com/uazo/SearchIt!/releases/latest/download/chrome-win.zip)
+- [chrome-win.zip](https://github.com/QuickshotMC1/SearchIt-/releases/latest/download/chrome-win.zip)
 
 #### Debugging symbols and proguard file for java stacktrace deobfuscation
 - x64_ChromePublic.apk.mapping
@@ -67,7 +67,7 @@ The following files will be present for each release:
 #### Chrlauncher autoupdate file:
 - updateurl.txt
 
-Additional files are also available: please note that these files are created by an [additional build](https://github.com/uazo/SearchIt!/actions/workflows/build_additional_targets.yaml) separate from the release process, and therefore may not be immediately available.
+Additional files are also available: please note that these files are created by an [additional build](https://github.com/QuickshotMC1/SearchIt-/actions/workflows/build_additional_targets.yaml) separate from the release process, and therefore may not be immediately available.
 
 #### SearchIt! System WebView apk for android:
 - arm64_SystemWebView.apk
@@ -85,7 +85,7 @@ Additional files are also available: please note that these files are created by
 ### F-droid
 
 Official F-droid repo url:
-https://www.SearchIt!.org/fdroid/repo/?fingerprint=49F37E74DEE483DCA2B991334FB5A0200787430D0B5F9A783DD5F13695E9517B
+https://www.cromite.org/fdroid/repo/?fingerprint=49F37E74DEE483DCA2B991334FB5A0200787430D0B5F9A783DD5F13695E9517B
 
 ### Auto-update in Android
 
@@ -101,7 +101,7 @@ You will be asked whether you want to activate the functionality during the firs
 [chrlauncher]
 
 # Custom Chromium update URL (string):
-ChromiumUpdateUrl=https://github.com/uazo/SearchIt!/releases/latest/download/updateurl.txt
+ChromiumUpdateUrl=https://github.com/QuickshotMC1/SearchIt-/releases/latest/download/updateurl.txt
 
 # Command line for Chromium (string):
 # note --user-data-dir= works better if path is absolute
@@ -136,7 +136,7 @@ you can activate (highly recommended) the 'RendererAppContainer' flag from the c
 In this case, it is also necessary to run icacls as indicated above.
 
 ### Auto-update setup for linux
-working in progress in https://github.com/uazo/SearchIt!/issues/771
+working in progress in https://github.com/QuickshotMC1/SearchIt-/issues/771
 
 ### Making SearchIt! work in Ubuntu 24.04 and its derivatives (kubuntu, etc)
 This happens because, starting with Ubuntu 24.04, Apparmor
@@ -167,9 +167,9 @@ Please submit issues following the issue template; beware that GitHub does not d
 
 Patches are welcome and accepted if they match the project goals.
 
-If you want to help me, [here](https://github.com/uazo/SearchIt!/blob/master/docs/HELP_ME_PLEASE.md) is the list of things I would need.
+If you want to help me, [here](https://github.com/QuickshotMC1/SearchIt-/blob/master/docs/HELP_ME_PLEASE.md) is the list of things I would need.
 
-For any usage or development discussion please use GitHub Discussions: https://github.com/uazo/SearchIt!/discussions
+For any usage or development discussion please use GitHub Discussions: https://github.com/QuickshotMC1/SearchIt-/discussions
 
 # Credits
 

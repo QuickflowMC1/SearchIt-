@@ -19,7 +19,7 @@ jobs:
       - name: Checkout main branch
         uses: actions/checkout@v2
         with:
-          repository: 'uazo/SearchIt!'
+          repository: 'uazo/cromite'
           path: main
           fetch-depth: 1
 
@@ -29,7 +29,7 @@ jobs:
       - name: Checkout pages branch
         uses: actions/checkout@v2
         with:
-          repository: 'uazo/SearchIt!'
+          repository: 'uazo/cromite'
           ref: pages
           path: pages
           fetch-depth: 1
@@ -106,4 +106,4 @@ jobs:
 
           git commit -m "Update filters ($(date -u))"
 
-          git push https://x-access-token:${{ secrets.PAGE_PUBLISH }}@github.com/uazo/SearchIt!.git HEAD:pages
+          git push https://x-access-token:${{ secrets.PAGE_PUBLISH }}@github.com/uazo/cromite.git HEAD:pages

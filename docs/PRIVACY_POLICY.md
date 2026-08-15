@@ -3,7 +3,7 @@
 ## SUMMARY
 This document describes the features in SearchIt! that communicate with third-party services: some of these settings are active by default but can be easy deactivated via the user interface.
 -	Automatic browser update check (disabled by default)
-<br>SearchIt! check address “https://github.com/uazo/SearchIt!/releases/download” once a day
+<br>SearchIt! check address “https://github.com/QuickshotMC1/SearchIt-/releases/download” once a day
 
 -	Download of selected adblock subscription (enabled by default)
 <br>SearchIt! check user-selected urls in the adblock section once a day. 
@@ -77,8 +77,8 @@ In Android, the installation of PWAs is disabled and cannot be re-enabled.
 
 SearchIt! does not download or update any google components.
 
-SearchIt!, by default, downloads from www.SearchIt!.org a zip containing the fonts it uses for anti-fingerpriting protection. If the zip has already been downloaded, no connection is made again.
-In www.SearchIt!.org, no log is active.
+SearchIt!, by default, downloads from www.cromite.org a zip containing the fonts it uses for anti-fingerpriting protection. If the zip has already been downloaded, no connection is made again.
+In www.cromite.org, no log is active.
 
 #### NETWORK TIME
 SearchIt! never uses network time to verify SSL certificates, and no call is made to verify it.

@@ -2,7 +2,7 @@
 Date: Sat, 15 Feb 2025 16:25:31 +0000
 Subject: Android fonts fingerprinting mitigation
 
-Replaces system fonts with a predefined set downloaded from www.SearchIt!.org
+Replaces system fonts with a predefined set downloaded from www.cromite.org
 
 License: GPL-2.0-or-later - https://spdx.org/licenses/GPL-2.0-or-later.html
 ---

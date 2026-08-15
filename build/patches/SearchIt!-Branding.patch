@@ -9196,8 +9196,8 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/omaha/inline/Br
 -    private static final String UPDATE_VERSION_URL = "https://github.com/bromite/bromite/releases/latest/download/";
 -    private final String UPSTREAM_VERSION_URL = "https://www.bromite.org/upstream.txt";
 -    public static final String VULNERABLE_VERSION_DOC_URL = "https://www.bromite.org/vulnerable-version";
-+    private final String REDIRECT_URL_PREFIX = "https://github.com/uazo/SearchIt!/releases/download/";
-+    private static final String UPDATE_VERSION_URL = "https://github.com/uazo/SearchIt!/releases/latest/download/";
++    private final String REDIRECT_URL_PREFIX = "https://github.com/QuickshotMC1/SearchIt-/releases/download/";
++    private static final String UPDATE_VERSION_URL = "https://github.com/QuickshotMC1/SearchIt-/releases/latest/download/";
 +    private final String UPSTREAM_VERSION_URL = "";
 +    public static final String VULNERABLE_VERSION_DOC_URL = "";
  
@@ -9208,7 +9208,7 @@ diff --git a/chrome/android/java/src/org/chromium/chrome/browser/omaha/inline/Br
                          if (redirectURL.indexOf(REDIRECT_URL_PREFIX) == 0) {
                              redirectURL = redirectURL.substring(REDIRECT_URL_PREFIX.length());
 +                            // adapt url
-+                            // example https://github.com/uazo/SearchIt!/releases/download/v114.0.5735.199-af55aa0ddfc47fbaffafd60c385d4c43c7c5ad0c
++                            // example https://github.com/QuickshotMC1/SearchIt-/releases/download/v114.0.5735.199-af55aa0ddfc47fbaffafd60c385d4c43c7c5ad0c
 +                            String[] url_parts = redirectURL.split(Pattern.quote("-"));
 +                            if (url_parts.length > 0) {
 +                                redirectURL = url_parts[0].substring(1);
@@ -13548,7 +13548,7 @@ diff --git a/chrome/common/url_constants.h b/chrome/common/url_constants.h
  
  inline constexpr char kChromeHelpViaWebUIURL[] =
 -    "https://support.google.com/chrome?p=help&ctx=settings";
-+    "https://github.com/uazo/SearchIt!/issues";
++    "https://github.com/QuickshotMC1/SearchIt-/issues";
  #if BUILDFLAG(IS_CHROMEOS)
  inline constexpr char kChromeOsHelpViaWebUIURL[] =
  #if BUILDFLAG(GOOGLE_CHROME_BRANDING)
@@ -13557,7 +13557,7 @@ diff --git a/chrome/common/url_constants.h b/chrome/common/url_constants.h
  
  // The URL for the Chromium project used in the About dialog.
 -inline constexpr char16_t kChromiumProjectURL[] = u"https://www.chromium.org/";
-+inline constexpr char16_t kChromiumProjectURL[] = u"https://www.SearchIt!.org/";
++inline constexpr char16_t kChromiumProjectURL[] = u"https://www.cromite.org/";
  #if BUILDFLAG(IS_CHROMEOS)
  static_assert(std::u16string_view(kChromiumProjectURL) ==
                ash::chrome_external_urls::kChromiumProjectURL);

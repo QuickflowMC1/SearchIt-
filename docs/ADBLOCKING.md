@@ -15,13 +15,13 @@ Some improvements have been included:
 - Block of WebSockets and WebTransport urls
 - Block of service workers fetchs
 
-All default filters are downloaded from www.SearchIt!.org/filters urls. You can enter your lists via the settings: http url redirection is prohibited.
+All default filters are downloaded from www.cromite.org/filters urls. You can enter your lists via the settings: http url redirection is prohibited.
 
 ### Update mechanism
 
 The SearchIt! AdBlock Update Service checks every day if new filters are published.
 
-www.SearchIt!.org does not record any logs.
+www.cromite.org does not record any logs.
 
 ## Legacy bromite adblock engine
 

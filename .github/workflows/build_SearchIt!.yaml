@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       sha:
-        description: 'uazo/SearchIt! SHA'
+        description: 'uazo/cromite SHA'
         required: true
         default: ''
       target_os:
@@ -117,12 +117,12 @@ jobs:
       - name: Building SearchIt! container ${{ env.VERSION }}-${{ env.SearchIt_SHA }}
         shell: bash
         run: |
-          docker pull uazo/SearchIt!:$VERSION-$SearchIt_SHA || true
-          IS_PRESENT=$(docker inspect --type=image uazo/SearchIt!:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
+          docker pull uazo/cromite:$VERSION-$SearchIt_SHA || true
+          IS_PRESENT=$(docker inspect --type=image uazo/cromite:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
           if [ $IS_PRESENT -ne "0" ]; then
-            IS_PRESENT=$(./regctl image inspect uazo/SearchIt!:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
+            IS_PRESENT=$(./regctl image inspect uazo/cromite:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
             if [ $IS_PRESENT -ne "0" ]; then
-              DOCKER_BUILDKIT=1 docker build -t uazo/SearchIt!:$VERSION-$SearchIt_SHA --progress plain \
+              DOCKER_BUILDKIT=1 docker build -t uazo/cromite:$VERSION-$SearchIt_SHA --progress plain \
                 --build-arg SearchIt_SHA=$SearchIt_SHA \
                 --build-arg VERSION=$VERSION \
                 --build-arg HTTP_PROXY="$PROXY_ADDR" \
@@ -133,12 +133,12 @@ jobs:
       - name: Building SearchIt!-build container ${{ env.VERSION }}-${{ env.SearchIt_SHA }}
         shell: bash
         run: |
-          docker pull uazo/SearchIt!-build:$VERSION-$SearchIt_SHA || true
-          IS_PRESENT=$(docker inspect --type=image uazo/SearchIt!-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
+          docker pull uazo/cromite-build:$VERSION-$SearchIt_SHA || true
+          IS_PRESENT=$(docker inspect --type=image uazo/cromite-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
           if [ $IS_PRESENT -ne "0" ]; then
-            IS_PRESENT=$(./regctl image inspect uazo/SearchIt!-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
+            IS_PRESENT=$(./regctl image inspect uazo/cromite-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
             if [ $IS_PRESENT -ne "0" ]; then
-              DOCKER_BUILDKIT=1 docker build -t uazo/SearchIt!-build:$VERSION-$SearchIt_SHA --progress plain \
+              DOCKER_BUILDKIT=1 docker build -t uazo/cromite-build:$VERSION-$SearchIt_SHA --progress plain \
                 --build-arg SearchIt_SHA=$SearchIt_SHA \
                 --build-arg VERSION=$VERSION \
                 --build-arg HTTP_PROXY="$PROXY_ADDR" \
@@ -147,22 +147,22 @@ jobs:
             fi
           fi
 
-      - name: Get uazo/SearchIt!-build from docker hub if present
+      - name: Get uazo/cromite-build from docker hub if present
         shell: bash
         run: |
-          IS_PRESENT=$(./regctl image inspect uazo/SearchIt!-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
+          IS_PRESENT=$(./regctl image inspect uazo/cromite-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
           if [ $IS_PRESENT -eq "0" ]; then
-            docker pull uazo/SearchIt!-build:$VERSION-$SearchIt_SHA
+            docker pull uazo/cromite-build:$VERSION-$SearchIt_SHA
           fi
 
       - name: Mark image to build
         shell: bash
         run: |
-          IS_PRESENT=$(docker inspect --type=image uazo/SearchIt!-build:build > /dev/null ; echo $?)
+          IS_PRESENT=$(docker inspect --type=image uazo/cromite-build:build > /dev/null ; echo $?)
           if [ $IS_PRESENT -eq "0" ]; then
-            docker rmi uazo/SearchIt!-build:build
+            docker rmi uazo/cromite-build:build
           fi
-          docker tag uazo/SearchIt!-build:$VERSION-$SearchIt_SHA uazo/SearchIt!-build:build
+          docker tag uazo/cromite-build:$VERSION-$SearchIt_SHA uazo/cromite-build:build
 
   build:
     runs-on: ${{ github.event.inputs.type }}
@@ -171,7 +171,7 @@ jobs:
     timeout-minutes: 1440
 
     container:
-      image: uazo/SearchIt!-build:build
+      image: uazo/cromite-build:build
       env:
         REMOVEDOCKERSUPPORT: true # CUSTOM RUNNER: remove sharing of docker socket
         USELOCALIMAGE: true       # CUSTOM RUNNER: permit use of local images

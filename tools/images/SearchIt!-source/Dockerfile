@@ -23,7 +23,7 @@ RUN sudo chmod +x ./apply-SearchIt!-patches.sh && \
     mkdir SearchIt! && \
     cd SearchIt! && \
     git init && \
-    git remote add origin https://github.com/uazo/SearchIt! && \
+    git remote add origin https://github.com/uazo/cromite && \
     git fetch origin $SearchIt_SHA && \
     git reset --hard FETCH_HEAD && \
     cd ..

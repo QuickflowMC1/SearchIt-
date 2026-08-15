@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       sha:
-        description: 'uazo/SearchIt! SHA'
+        description: 'uazo/cromite SHA'
         required: true
         default: ''
       type:
@@ -63,22 +63,22 @@ jobs:
 
           cd SearchIt!/tools
 
-      - name: Get uazo/SearchIt!-build from docker hub if present
+      - name: Get uazo/cromite-build from docker hub if present
         shell: bash
         run: |
-          IS_PRESENT=$(docker manifest inspect uazo/SearchIt!-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
+          IS_PRESENT=$(docker manifest inspect uazo/cromite-build:$VERSION-$SearchIt_SHA > /dev/null ; echo $?)
           if [ $IS_PRESENT -eq "0" ]; then
-            docker pull uazo/SearchIt!-build:$VERSION-$SearchIt_SHA
+            docker pull uazo/cromite-build:$VERSION-$SearchIt_SHA
           fi
 
       - name: Mark image to build
         shell: bash
         run: |
-          IS_PRESENT=$(docker inspect --type=image uazo/SearchIt!-build:build > /dev/null ; echo $?)
+          IS_PRESENT=$(docker inspect --type=image uazo/cromite-build:build > /dev/null ; echo $?)
           if [ $IS_PRESENT -eq "0" ]; then
-            docker rmi uazo/SearchIt!-build:build
+            docker rmi uazo/cromite-build:build
           fi
-          docker tag uazo/SearchIt!-build:$VERSION-$SearchIt_SHA uazo/SearchIt!-build:build
+          docker tag uazo/cromite-build:$VERSION-$SearchIt_SHA uazo/cromite-build:build
 
   build:
     runs-on: ${{ github.event.inputs.type }}
@@ -87,7 +87,7 @@ jobs:
     timeout-minutes: 1440
 
     container:
-      image: uazo/SearchIt!-build:build
+      image: uazo/cromite-build:build
       env:
         REMOVEDOCKERSUPPORT: true # CUSTOM RUNNER: remove sharing of docker socket
         USELOCALIMAGE: true       # CUSTOM RUNNER: permit use of local images

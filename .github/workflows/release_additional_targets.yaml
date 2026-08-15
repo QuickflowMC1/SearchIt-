@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       sha:
-        description: 'uazo/SearchIt! SHA'
+        description: 'uazo/cromite SHA'
         required: true
         default: ''
       type:
@@ -34,13 +34,13 @@ jobs:
         run: |
           wget https://github.com/ericchiang/pup/releases/download/v0.4.0/pup_v0.4.0_linux_amd64.zip
           unzip pup_v0.4.0_linux_amd64.zip && rm pup_v0.4.0_linux_amd64.zip
-          BRANCH=$(curl https://github.com/uazo/SearchIt!/branch_commits/$SearchIt_SHA | ./pup -p li.branch:last-child a text{} | xargs)
+          BRANCH=$(curl https://github.com/uazo/cromite/branch_commits/$SearchIt_SHA | ./pup -p li.branch:last-child a text{} | xargs)
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      - name: Checkout 'uazo/SearchIt!'
+      - name: Checkout 'uazo/cromite'
         uses: actions/checkout@v2
         with:
-            repository: 'uazo/SearchIt!'
+            repository: 'uazo/cromite'
             path: 'SearchIt!'
             fetch-depth: 1
 

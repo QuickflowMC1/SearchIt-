@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       rtag:
-        description: 'uazo/SearchIt! TAG or COMMIT'
+        description: 'uazo/cromite TAG or COMMIT'
         required: true
         default: ''
 
@@ -53,9 +53,9 @@ jobs:
           unzip pup_v0.4.0_linux_amd64.zip
           rm pup_v0.4.0_linux_amd64.zip
 
-          BRANCH=$(curl https://github.com/uazo/SearchIt!/branch_commits/$RTAG | ./pup -p li.branch:last-child a text{})
+          BRANCH=$(curl https://github.com/uazo/cromite/branch_commits/$RTAG | ./pup -p li.branch:last-child a text{})
           if [ -z "${BRANCH}" ]; then
-            BRANCH=$(curl https://github.com/uazo/SearchIt!/branch_commits/$RTAG a | ./pup -p li.branch:first-child a text{})
+            BRANCH=$(curl https://github.com/uazo/cromite/branch_commits/$RTAG a | ./pup -p li.branch:first-child a text{})
           fi
           if [ -z "${BRANCH}" ]; then
             echo "Can not recover the base commit"
@@ -63,10 +63,10 @@ jobs:
           fi
           echo "BRANCH=$BRANCH" >> $GITHUB_ENV
 
-      - name: Checkout 'uazo/SearchIt!' ${{ env.BRANCH }}
+      - name: Checkout 'uazo/cromite' ${{ env.BRANCH }}
         uses: actions/checkout@v2
         with:
-            repository: 'uazo/SearchIt!'
+            repository: 'uazo/cromite'
             ref: ${{ github.event.inputs.rtag }}
             path: 'SearchIt!'
             fetch-depth: 1
@@ -144,7 +144,7 @@ jobs:
           token: ${{ secrets.SearchIt_PULLS }}
           path: SearchIt!
           base: ${{ env.BRANCH }}
-          #push-to-fork: uazo/SearchIt!
+          #push-to-fork: uazo/cromite
           add-paths: |
             build/patches/*.patch
           commit-message: '[AUTO] Patches auto-rebase'

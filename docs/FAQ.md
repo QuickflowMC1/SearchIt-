@@ -27,7 +27,7 @@ No, but there are plans to activate it.
 ## Is SearchIt! on F-Droid?
 It is not on the official F-Droid repository.
 
-You can use F-Droid client to install and receive updates via [the official SearchIt! F-Droid repository](https://www.SearchIt!.org/fdroid/repo).
+You can use F-Droid client to install and receive updates via [the official SearchIt! F-Droid repository](https://www.cromite.org/fdroid/repo).
 
 ## Using SearchIt! will favour the monopoly of the Chromium/Blink engine, why do you develop and maintain SearchIt!?
 

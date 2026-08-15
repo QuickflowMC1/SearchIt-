@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       rtag:
-        description: 'uazo/SearchIt! TAG or COMMIT'
+        description: 'uazo/cromite TAG or COMMIT'
         required: true
         default: ''
 
@@ -40,10 +40,10 @@ jobs:
             echo "RTAG=$RTAG"
           fi
 
-      - name: Checkout 'uazo/SearchIt!' ${{ env.BRANCH }}
+      - name: Checkout 'uazo/cromite' ${{ env.BRANCH }}
         uses: actions/checkout@v2
         with:
-            repository: 'uazo/SearchIt!'
+            repository: 'uazo/cromite'
             ref: ${{ github.event.inputs.rtag }}
             path: 'SearchIt!'
             fetch-depth: 1
