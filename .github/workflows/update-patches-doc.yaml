@@ -2,7 +2,7 @@
 permissions:
 #  actions: none
 #  checks: none
-#  contents: write
+  contents: write
 #  deployments: none
 #  issues: none
 #  packages: none
@@ -21,7 +21,7 @@ on:
   workflow_dispatch:
     inputs:
       rtag:
-        description: 'uazo/cromite TAG or COMMIT'
+        description: 'QuickflowMC1/SearchIt- TAG or COMMIT'
         required: true
         default: ''
 
@@ -40,11 +40,11 @@ jobs:
             echo "RTAG=$RTAG"
           fi
 
-      - name: Checkout 'uazo/cromite' ${{ env.BRANCH }}
+      - name: Checkout 'QuickflowMC1/SearchIt-' ${{ env.BRANCH }}
         uses: actions/checkout@v2
         with:
-            repository: 'uazo/cromite'
-            ref: ${{ github.event.inputs.rtag }}
+            repository: 'QuickflowMC1/SearchIt-'
+            ref: ${{ env.RTAG }}
             path: 'SearchIt!'
             fetch-depth: 1
 
@@ -70,7 +70,7 @@ jobs:
         uses: peter-evans/create-pull-request@c5a7806660adbe173f04e3e038b0ccdcd758773c #v6.1.0
         if: env.CHANGES == '1'
         with:
-          token: ${{ secrets.SearchIt_PULLS }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           path: SearchIt!
           base: ${{ env.BRANCH }}
           add-paths: |
