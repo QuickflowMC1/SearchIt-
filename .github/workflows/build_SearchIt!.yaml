@@ -12,6 +12,9 @@ permissions:
   statuses: none
 
 on:
+  push:
+    branches:
+      - 'master'
   workflow_dispatch:
     inputs:
       sha:
@@ -40,7 +43,7 @@ on:
         default: 'false'
 
 env:
-  SearchIt_SHA: ${{ github.event.inputs.sha }}
+  SearchIt_SHA: ${{ github.event.inputs.sha || github.sha }}
   REMOVEDOCKERSUPPORT: true
   USELOCALIMAGE: true
 
@@ -52,7 +55,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: SearchIt!
-          ref: ${{ github.event.inputs.sha }}
+          ref: ${{ env.SearchIt_SHA }}
           fetch-depth: 1
 
       - name: Enable proxy on container
